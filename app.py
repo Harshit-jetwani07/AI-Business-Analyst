@@ -1,4 +1,4 @@
-﻿import streamlit as st
+import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.express as px
@@ -125,7 +125,8 @@ def super_smart_data_loader(uploaded_file):
 
         if 'Parsed_Date' not in df.columns:
             df['Parsed_Date'] = pd.date_range(start="2023-01-01", periods=len(df), freq="D")
-            
+
+        df.columns = make_unique_columns(df.columns)
         return df
 
     except Exception as e:
@@ -142,6 +143,17 @@ def persist_uploaded_file(uploaded_file, username):
     with open(file_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
     return file_path
+
+
+def make_unique_columns(columns):
+    seen = {}
+    unique = []
+    for col in columns:
+        base = str(col).strip() or "Column"
+        count = seen.get(base, 0)
+        unique.append(base if count == 0 else f"{base}_{count + 1}")
+        seen[base] = count + 1
+    return unique
 
 
 #  Page config 
@@ -862,4 +874,5 @@ else:
                     )
                 else:
                     st.error("Report generation failed. Check your API key.")
+                    
 
