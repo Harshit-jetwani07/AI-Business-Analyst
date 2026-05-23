@@ -1,0 +1,25 @@
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+.env
+.venv/
+venv/
+env/
+
+# Local runtime data
+data/*.db
+uploads/*
+reports/*
+exports/*
+
+# Keep folders available in repo
+!uploads/.gitkeep
+!reports/.gitkeep
+!exports/.gitkeep
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
