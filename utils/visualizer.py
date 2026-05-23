@@ -19,10 +19,24 @@ COLOR_SEQ = px.colors.qualitative.Bold
 class Visualizer:
     def __init__(self, df: pd.DataFrame):
         self.df = df.copy()
+        self.df.columns = self._make_unique_columns(self.df.columns)
         for col in self.df.select_dtypes(include="object").columns:
-            parsed = pd.to_datetime(self.df[col], errors="coerce", format="mixed")
-            if parsed.notna().sum() > 0.7 * self.df[col].notna().sum():
-                self.df[col] = parsed
+            try:
+                parsed = pd.to_datetime(self.df[col], errors="coerce", format="mixed")
+                if parsed.notna().sum() > 0.7 * self.df[col].notna().sum():
+                    self.df[col] = parsed
+            except Exception:
+                pass
+
+    def _make_unique_columns(self, columns):
+        seen = {}
+        unique = []
+        for col in columns:
+            base = str(col).strip() or "Column"
+            count = seen.get(base, 0)
+            unique.append(base if count == 0 else f"{base}_{count + 1}")
+            seen[base] = count + 1
+        return unique
 
     def _numeric_series(self, col):
         if col not in self.df.columns:
@@ -236,22 +250,27 @@ class Visualizer:
         latest_col = fy_cols[-1] if fy_cols else (num_cols[0] if num_cols else None)
 
         if metric_col and latest_col:
-            plot_df = self.df[[metric_col]].copy()
-            plot_df[latest_col] = self._numeric_series(latest_col)
-            plot_df = plot_df.dropna(subset=[metric_col, latest_col])
-            plot_df = plot_df[plot_df[latest_col] != 0]
+            cat_alias = "_chart_category"
+            val_alias = "_chart_value"
+            plot_df = pd.DataFrame({
+                cat_alias: self.df[metric_col].astype(str),
+                val_alias: self._numeric_series(latest_col),
+            })
+            plot_df = plot_df.dropna(subset=[cat_alias, val_alias])
+            plot_df = plot_df[plot_df[val_alias] != 0]
             if not plot_df.empty:
-                agg = plot_df.groupby(metric_col, dropna=True)[latest_col].sum().reset_index()
-                agg = agg.reindex(agg[latest_col].abs().sort_values(ascending=False).index).head(12)
+                agg = plot_df.groupby(cat_alias, dropna=True, as_index=False)[val_alias].sum()
+                agg = agg.reindex(agg[val_alias].abs().sort_values(ascending=False).index).head(12)
                 fig = px.bar(
-                    agg.sort_values(latest_col),
-                    x=latest_col,
-                    y=metric_col,
+                    agg.sort_values(val_alias),
+                    x=val_alias,
+                    y=cat_alias,
                     orientation="h",
                     title=f"Top {metric_col} by {latest_col}",
-                    color=latest_col,
+                    color=val_alias,
                     color_continuous_scale="Viridis",
                     template="plotly_dark",
+                    labels={cat_alias: str(metric_col), val_alias: str(latest_col)},
                 )
                 figs.append(self._clean_fig(fig, height=520))
 
