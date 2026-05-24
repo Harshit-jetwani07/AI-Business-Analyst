@@ -6,7 +6,7 @@ An end-to-end AI-powered business analytics platform built with Streamlit, Pytho
 
 Add your Streamlit deployment URL here after publishing:
 
-`https://ai-business-analyst-harsh07.streamlit.app/`
+`https://your-app-name.streamlit.app`
 
 ## Key Features
 
@@ -75,6 +75,21 @@ Use one of these in the sidebar:
 - Ollama: `ollama=http://localhost:11434`
 
 Ollama works only where the deployed environment can access the Ollama server. For Streamlit Cloud, use hosted API providers such as OpenAI, Gemini, or Groq.
+
+## Email OTP For Password Reset
+
+Forgot Password can send OTPs to the registered user email through SMTP. Configure Streamlit secrets:
+
+```toml
+[smtp]
+host = "smtp.gmail.com"
+port = 587
+user = "your_email@gmail.com"
+password = "your_gmail_app_password"
+from_email = "your_email@gmail.com"
+```
+
+Use a Gmail App Password or a transactional SMTP provider password. Do not commit real email passwords to GitHub.
 
 ## Deployment
 
