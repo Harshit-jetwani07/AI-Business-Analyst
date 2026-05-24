@@ -1,7 +1,91 @@
-﻿import streamlit as st
+import streamlit as st
 import hashlib
 import secrets
-from utils.auth import get_conn, log_activity, authenticate
+import re
+import os
+import smtplib
+from email.message import EmailMessage
+from utils.auth import get_conn, log_activity, authenticate, create_user
+
+
+def password_strength(password: str) -> tuple[int, str]:
+    strength = 0
+    if len(password) >= 8:
+        strength += 1
+    if re.search(r"[a-z]", password) and re.search(r"[A-Z]", password):
+        strength += 1
+    if re.search(r"\d", password):
+        strength += 1
+    if re.search(r"[_@$%&*!#.-]", password):
+        strength += 1
+    labels = ["Weak", "Moderate", "Strong", "Excellent"]
+    return strength, labels[max(strength, 1) - 1] if password else "Weak"
+
+
+def user_exists(username: str = "", email: str = "") -> tuple[bool, str]:
+    conn = get_conn()
+    row = conn.execute(
+        "SELECT username,email FROM users WHERE lower(username)=lower(?) OR lower(email)=lower(?)",
+        (username.strip(), email.strip())
+    ).fetchone()
+    conn.close()
+    if not row:
+        return False, ""
+    if row["username"].lower() == username.strip().lower():
+        return True, "Username already exists."
+    return True, "Email is already registered."
+
+
+def get_smtp_setting(key: str, default: str = "") -> str:
+    try:
+        if "smtp" in st.secrets and key in st.secrets["smtp"]:
+            return str(st.secrets["smtp"][key])
+    except Exception:
+        pass
+    return os.getenv(f"SMTP_{key.upper()}", default)
+
+
+def send_otp_email(to_email: str, username: str, otp: str) -> tuple[bool, str]:
+    host = get_smtp_setting("host")
+    port = int(get_smtp_setting("port", "587") or "587")
+    sender = get_smtp_setting("user")
+    password = get_smtp_setting("password")
+    from_email = get_smtp_setting("from_email", sender)
+
+    if not host or not sender or not password or not from_email:
+        return False, "SMTP email settings are not configured."
+
+    msg = EmailMessage()
+    msg["Subject"] = "AI Business Analyst password reset OTP"
+    msg["From"] = from_email
+    msg["To"] = to_email
+    msg.set_content(
+        f"Hi {username},\n\n"
+        f"Your AI Business Analyst password reset OTP is: {otp}\n\n"
+        "This code is valid for this reset session. If you did not request this, ignore this email.\n\n"
+        "AI Business Analyst"
+    )
+
+    try:
+        with smtplib.SMTP(host, port, timeout=20) as server:
+            server.starttls()
+            server.login(sender, password)
+            server.send_message(msg)
+        return True, "OTP sent to your registered email."
+    except Exception as exc:
+        return False, f"Email delivery failed: {exc}"
+
+
+def mask_email(email: str) -> str:
+    if "@" not in email:
+        return email
+    name, domain = email.split("@", 1)
+    if len(name) <= 2:
+        masked = name[0] + "*"
+    else:
+        masked = name[0] + "*" * (len(name) - 2) + name[-1]
+    return f"{masked}@{domain}"
+
 
 def show_login_page():
     """Render login screen with pixel-perfect center-aligned actions."""
@@ -115,41 +199,112 @@ def show_login_page():
                             st.rerun()
                         else:
                             st.error("Invalid username, password, or inactive account.")
-                            st.session_state["show_forgot_link"] = True
-                            st.rerun()
                             
-            # Conditional Render: Appears ONLY when wrong credentials are hit
-            if st.session_state["show_forgot_link"]:
-                st.markdown('<div class="link-wrapper">', unsafe_allow_html=True)
+            st.markdown('<div class="link-wrapper">', unsafe_allow_html=True)
+            link_col1, link_col2 = st.columns(2)
+            with link_col1:
                 if st.button("Forgot Password?", key="lnk_switch_to_forgot"):
                     st.session_state["reset_mode"] = "forgot"
                     st.rerun()
-                st.markdown('</div>', unsafe_allow_html=True)
+            with link_col2:
+                if st.button("Create Account", key="lnk_switch_to_register"):
+                    st.session_state["show_forgot_link"] = False
+                    st.session_state["reset_mode"] = "register"
+                    st.rerun()
+            st.markdown('</div>', unsafe_allow_html=True)
 
-        #  2 FORGOT VIEW MODE 
+        #  2 PUBLIC REGISTRATION VIEW MODE
+        elif current_mode == "register":
+            st.markdown('<div class="brand-logo">📊</div><div class="login-title">Create Account</div><div class="login-sub">Start with a standard user workspace</div>', unsafe_allow_html=True)
+
+            with st.form(key="form_execution_register_isolated"):
+                reg_username = st.text_input("Username", placeholder="e.g. harshit_data", key="register_username_widget")
+                reg_email = st.text_input("Email Address", placeholder="name@example.com", key="register_email_widget")
+                reg_password = st.text_input("Password", type="password", placeholder="Choose a password", key="register_password_widget")
+                reg_confirm = st.text_input("Confirm Password", type="password", placeholder="Re-enter password", key="register_confirm_widget")
+
+                if reg_password:
+                    strength, label = password_strength(reg_password)
+                    colors = ["#ff4b4b", "#ffaa00", "#ccff00", "#00ffcc"]
+                    display_strength = max(strength, 1)
+                    st.markdown(
+                        f"<p style='font-size:0.8rem; margin:0;'>Strength: <span style='color:{colors[display_strength-1]};'>{label}</span></p>",
+                        unsafe_allow_html=True
+                    )
+                    st.progress(strength / 4)
+
+                register_btn = st.form_submit_button("Create Account")
+
+                if register_btn:
+                    username = reg_username.strip()
+                    email = reg_email.strip()
+                    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+
+                    if not username or not email or not reg_password or not reg_confirm:
+                        st.error("Please fill all registration fields.")
+                    elif not re.match(r"^[a-zA-Z0-9_]{3,30}$", username):
+                        st.error("Username must be 3-30 characters and can contain only letters, numbers, and underscores.")
+                    elif not re.match(email_pattern, email):
+                        st.error("Invalid email format.")
+                    elif reg_password != reg_confirm:
+                        st.error("Password and Confirm Password do not match.")
+                    elif len(reg_password) < 6:
+                        st.error("Password must be at least 6 characters long.")
+                    else:
+                        exists, message = user_exists(username, email)
+                        if exists:
+                            st.error(message)
+                        elif create_user(username, email, reg_password, "user"):
+                            log_activity(username, "Register", "Self-service user account created.")
+                            st.success("Account created successfully. Please sign in.")
+                            st.session_state["reset_mode"] = "login"
+                            st.session_state["show_forgot_link"] = False
+                            st.rerun()
+                        else:
+                            st.error("Account creation failed. Try a different username or email.")
+
+            st.markdown('<div class="link-wrapper">', unsafe_allow_html=True)
+            if st.button("Back to Login", key="lnk_register_back_to_login"):
+                st.session_state["show_forgot_link"] = False
+                st.session_state["reset_mode"] = "login"
+                st.rerun()
+            st.markdown('</div>', unsafe_allow_html=True)
+
+        #  3 FORGOT VIEW MODE 
         elif current_mode == "forgot":
             st.markdown('<div class="brand-logo">📊</div><div class="login-title">AI Business Analyst</div><div class="login-sub">Reset access securely</div>', unsafe_allow_html=True)
             
             with st.form(key="form_execution_forgot_isolated"):
-                target_user = st.text_input("Target Username", placeholder="Enter your username", key="forgot_username_widget")
-                gen_otp_btn = st.form_submit_button("Generate OTP")
+                target_user = st.text_input("Username or Email", placeholder="Enter your username or registered email", key="forgot_username_widget")
+                gen_otp_btn = st.form_submit_button("Send OTP")
                 
                 if gen_otp_btn:
                     if target_user:
                         conn = get_conn()
-                        user = conn.execute("SELECT * FROM users WHERE username = ?", (target_user.strip(),)).fetchone()
+                        user = conn.execute(
+                            "SELECT * FROM users WHERE lower(username)=lower(?) OR lower(email)=lower(?)",
+                            (target_user.strip(), target_user.strip())
+                        ).fetchone()
                         conn.close()
                         
                         if user:
                             generated_otp = str(secrets.randbelow(899999) + 100000)
-                            st.session_state["recovery_otp"] = generated_otp
-                            st.session_state["recovery_user"] = target_user.strip()
-                            st.session_state["reset_mode"] = "verify"
-                            st.rerun()
+                            sent, message = send_otp_email(user["email"], user["username"], generated_otp)
+                            if sent:
+                                st.session_state["recovery_otp"] = generated_otp
+                                st.session_state["recovery_user"] = user["username"]
+                                st.session_state["recovery_email"] = user["email"]
+                                st.session_state["reset_mode"] = "verify"
+                                log_activity(user["username"], "Password OTP Sent", f"OTP sent to {mask_email(user['email'])}")
+                                st.success(f"OTP sent to {mask_email(user['email'])}.")
+                                st.rerun()
+                            else:
+                                st.error(message)
+                                st.caption("Admin must configure SMTP settings in Streamlit secrets for email OTP delivery.")
                         else:
-                            st.error("Username index not found inside database registries.")
+                            st.error("No account found for this username or email.")
                     else:
-                        st.warning("Please specify a target username.")
+                        st.warning("Please enter your username or registered email.")
                         
             st.markdown('<div class="link-wrapper">', unsafe_allow_html=True)
             if st.button("Back to Login", key="lnk_back_to_login_view"):
@@ -158,11 +313,14 @@ def show_login_page():
                 st.rerun()
             st.markdown('</div>', unsafe_allow_html=True)
 
-        #  3 VERIFY VIEW MODE 
+        #  4 VERIFY VIEW MODE 
         elif current_mode == "verify":
             st.markdown('<div class="brand-logo">📊</div><div class="login-title">Security Key</div><div class="login-sub">Enter verification token</div>', unsafe_allow_html=True)
             
-            st.info("A reset OTP was generated. For production, send this code by email or SMS instead of displaying it in the app.")
+            if st.session_state.get("recovery_email"):
+                st.info(f"Enter the OTP sent to {mask_email(st.session_state.get('recovery_email'))}.")
+            else:
+                st.info("Enter the OTP sent to your registered email.")
             
             with st.form(key="form_execution_verify_isolated"):
                 input_otp = st.text_input("Enter 6-Digit OTP", placeholder="", key="verify_otp_widget")
@@ -186,8 +344,12 @@ def show_login_page():
                                 conn.close()
                                 
                                 st.success("Access credentials updated. Proceeding to login.")
+                                log_activity(st.session_state.get("recovery_user"), "Password Reset", "Password reset completed after email OTP verification.")
                                 st.session_state["show_forgot_link"] = False 
                                 st.session_state["reset_mode"] = "login"
+                                st.session_state.pop("recovery_otp", None)
+                                st.session_state.pop("recovery_user", None)
+                                st.session_state.pop("recovery_email", None)
                                 st.rerun()
                             else:
                                 st.error("Password string must contain at least 6 characters.")
@@ -212,4 +374,3 @@ if __name__ == "__main__":
         show_login_page()
     else:
         st.markdown("<div style='text-align:center; padding:50px;'><h3>Dashboard Authenticated Successfully</h3><p style='color:#6060a0;'>Use the main sidebar panel to jump to workspaces.</p></div>", unsafe_allow_html=True)
-
