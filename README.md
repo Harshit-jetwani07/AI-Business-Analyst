@@ -41,8 +41,8 @@ The app seeds demo accounts automatically on first run:
 
 | Role | Username | Password |
 | --- | --- | --- |
-| Admin | `Harshit` | `harshit@07` |
-| User | `anand` | `anand01` |
+| Admin | `admin` | `admin123` |
+| User | `demouser` | `user123` |
 
 For a real deployment, change or remove these demo credentials.
 
