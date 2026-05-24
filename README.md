@@ -6,7 +6,7 @@ An end-to-end AI-powered business analytics platform built with Streamlit, Pytho
 
 Add your Streamlit deployment URL here after publishing:
 
-`https://your-app-name.streamlit.app`
+`https://ai-business-analyst-harsh07.streamlit.app/`
 
 ## Key Features
 
