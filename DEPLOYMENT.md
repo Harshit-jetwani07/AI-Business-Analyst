@@ -34,6 +34,30 @@ This is the fastest deployment path for this project.
 - For AI Chat and Report generation, users must enter an API key in the sidebar.
 - Ollama local endpoints usually do not work on Streamlit Cloud unless the endpoint is publicly reachable.
 
+## Email OTP Setup
+
+Forgot Password sends OTP to the user's registered email when SMTP settings are configured.
+
+In Streamlit Cloud:
+
+1. Open your deployed app.
+2. Click `Manage app`.
+3. Open `Settings`.
+4. Open `Secrets`.
+5. Add SMTP credentials:
+
+```toml
+[smtp]
+host = "smtp.gmail.com"
+port = 587
+user = "your_email@gmail.com"
+password = "your_gmail_app_password"
+from_email = "your_email@gmail.com"
+```
+
+For Gmail, use an App Password, not your normal Gmail password.
+After saving secrets, reboot the app.
+
 ## GitHub Commands
 
 If Git is installed:
