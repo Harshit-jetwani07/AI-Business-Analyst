@@ -1,0 +1,17 @@
+.git
+.venv
+venv
+env
+__pycache__
+.pytest_cache
+.env
+*.pyc
+*.pyo
+data/*.db
+uploads/*
+reports/*
+exports/*
+!uploads/.gitkeep
+!reports/.gitkeep
+!exports/.gitkeep
+submission_assets/*.zip
