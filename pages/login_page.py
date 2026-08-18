@@ -870,13 +870,13 @@ def show_auth_step(embedded: bool = False):
     """, unsafe_allow_html=True)
 
     if embedded:
-        form_parent = st
+        form_parent = st.container()
     else:
         st.markdown(
             '<div class="auth-shell"><a href="#top-auth">Back to landing</a><span>Secure BizVision AI workspace access</span></div>',
             unsafe_allow_html=True,
         )
-        form_parent = st
+        form_parent = st.container()
 
     # State routers initializations
     if "reset_mode" not in st.session_state:
