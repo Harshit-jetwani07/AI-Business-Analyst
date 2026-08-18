@@ -101,25 +101,10 @@ def mask_email(email: str) -> str:
 
 
 def show_login_page():
-    """Render the logged-out landing page and secondary auth step."""
-    view_param = st.query_params.get("view", "") if hasattr(st, "query_params") else ""
-    auth_param = st.query_params.get("auth", "") if hasattr(st, "query_params") else ""
-    if view_param == "landing":
-        st.session_state["landing_auth_mode"] = False
+    """Render the logged-out landing page with embedded auth access."""
+    if "reset_mode" not in st.session_state:
         st.session_state["reset_mode"] = "login"
-        if hasattr(st, "query_params"):
-            st.query_params.clear()
-        st.rerun()
-
-    if auth_param in {"login", "register"} and not st.session_state.get("landing_auth_mode"):
-        st.session_state["landing_auth_mode"] = True
-        st.session_state["reset_mode"] = "register" if auth_param == "register" else "login"
-
-    if not st.session_state.get("landing_auth_mode", False):
-        show_landing_page()
-        return
-
-    show_auth_step()
+    show_landing_page()
 
 
 def show_landing_page():
@@ -428,8 +413,8 @@ def show_landing_page():
           <a href="#docs">Docs</a>
         </div>
         <div class="bv-nav-actions">
-          <a class="bv-btn" href="?auth=login">Sign In</a>
-          <a class="bv-btn primary" href="?auth=register">Get Started</a>
+          <a class="bv-btn" href="#access">Sign In</a>
+          <a class="bv-btn primary" href="#access">Get Started</a>
         </div>
       </nav>
 
@@ -439,8 +424,8 @@ def show_landing_page():
           <h1>Turn Your Business Data Into <span class="bv-gradient-text">Instant AI Insights</span></h1>
           <p class="bv-subhead">{BRAND_NAME} converts CSV and Excel files into dashboards, quality scores, forecasts, anomaly alerts, AI answers, and export-ready PDF reports.</p>
           <div class="bv-hero-actions">
-            <a class="bv-btn primary" href="?auth=register">Get Started Free</a>
-            <a class="bv-btn" href="?auth=login">Sign In</a>
+            <a class="bv-btn primary" href="#access">Get Started Free</a>
+            <a class="bv-btn" href="#access">Sign In</a>
           </div>
           <div class="bv-mini-proof">
             <span>Smart parser</span><span>AI chat</span><span>Forecasting</span><span>Admin approvals</span>
@@ -522,20 +507,24 @@ def show_landing_page():
       <section class="bv-final">
         <h2>Start Analyzing Your Data Today</h2>
         <p>Upload a file, ask questions, detect patterns, forecast trends, and export your report.</p>
-        <a class="bv-btn primary" href="?auth=register">Get Started Free</a>
+        <a class="bv-btn primary" href="#access">Get Started Free</a>
       </section>
-
-      <footer class="bv-footer">
-        <div><img src="{logo_data_uri}" alt="{BRAND_NAME} logo"><div>{BRAND_TAGLINE}</div></div>
-        <div><a href="#features">Features</a><a href="#how">Workflow</a><a href="#preview">Preview</a><a href="?auth=login">Sign In</a></div>
-        <div>Copyright 2026 BizVision AI. All rights reserved.</div>
-      </footer>
     </div>
     """, unsafe_allow_html=True)
 
+    show_auth_step(embedded=True)
 
-def show_auth_step():
-    """Render the clean centered auth form after a landing CTA is clicked."""
+    st.markdown(f"""
+    <footer class="bv-footer">
+      <div><img src="{logo_data_uri}" alt="{BRAND_NAME} logo"><div>{BRAND_TAGLINE}</div></div>
+      <div><a href="#features">Features</a><a href="#how">Workflow</a><a href="#preview">Preview</a><a href="#access">Sign In</a></div>
+      <div>Copyright 2026 BizVision AI. All rights reserved.</div>
+    </footer>
+    """, unsafe_allow_html=True)
+
+
+def show_auth_step(embedded: bool = False):
+    """Render the clean centered auth form."""
     logo_data_uri = brand_logo_data_uri()
 
     def brand_header(title: str, subtitle: str) -> str:
@@ -660,13 +649,81 @@ def show_auth_step():
         color: #bfa6ff !important;
         text-decoration: underline !important;
     }
+    .access-copy {
+        padding: 28px;
+        border: 1px solid rgba(148, 163, 184, .16);
+        border-radius: 24px;
+        background:
+            radial-gradient(circle at 12% 0%, rgba(0, 212, 255, .14), transparent 36%),
+            linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.035));
+        box-shadow: 0 22px 58px rgba(0,0,0,.22);
+    }
+    .access-copy h2 {
+        color: #ffffff;
+        font-size: clamp(2rem, 4vw, 3.25rem);
+        line-height: 1.04;
+        letter-spacing: -0.035em;
+        margin: 0 0 14px;
+    }
+    .access-copy p {
+        color: #aeb9d8;
+        line-height: 1.68;
+        font-size: 1.02rem;
+        margin: 0 0 20px;
+    }
+    .access-bullets {
+        display: grid;
+        gap: 12px;
+        margin-top: 22px;
+    }
+    .access-bullet {
+        border: 1px solid rgba(148, 163, 184, .14);
+        border-radius: 16px;
+        background: rgba(255,255,255,.045);
+        color: #dbeafe;
+        padding: 14px 16px;
+        font-weight: 750;
+    }
+    .access-bullet span { color: #67e8f9; margin-right: 8px; }
     </style>
     """, unsafe_allow_html=True)
 
-    st.markdown(
-        '<div class="auth-shell"><a href="?view=landing">Back to landing</a><span>Secure BizVision AI workspace access</span></div>',
-        unsafe_allow_html=True,
-    )
+    if embedded:
+        st.markdown('<div id="access" style="height:1px;"></div>', unsafe_allow_html=True)
+        st.markdown(
+            """
+            <section class="bv-section" style="padding-top:72px;">
+              <div class="bv-section-title">
+                <h2>Access Your Analytics Workspace</h2>
+                <p>Sign in or create an account without leaving the landing page.</p>
+              </div>
+            </section>
+            """,
+            unsafe_allow_html=True,
+        )
+        access_copy, access_form = st.columns([1.05, 0.95], gap="large")
+        with access_copy:
+            st.markdown(
+                """
+                <div class="access-copy">
+                  <h2>From raw files to decisions in minutes.</h2>
+                  <p>Use one secure workspace for uploads, AI questions, charts, forecasts, anomaly checks, reports, and admin review.</p>
+                  <div class="access-bullets">
+                    <div class="access-bullet"><span>01</span> Smart CSV/Excel parsing</div>
+                    <div class="access-bullet"><span>02</span> AI insights and auto charts</div>
+                    <div class="access-bullet"><span>03</span> Forecasts, anomaly detection, PDF reports</div>
+                  </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        form_parent = access_form
+    else:
+        st.markdown(
+            '<div class="auth-shell"><a href="#access">Back to landing</a><span>Secure BizVision AI workspace access</span></div>',
+            unsafe_allow_html=True,
+        )
+        form_parent = st
 
     # State routers initializations
     if "reset_mode" not in st.session_state:
@@ -674,7 +731,7 @@ def show_auth_step():
     if "show_forgot_link" not in st.session_state:
         st.session_state["show_forgot_link"] = False
 
-    with st.container():
+    with form_parent:
         st.markdown('<div class="custom-login-box"></div>', unsafe_allow_html=True)
         
         current_mode = st.session_state["reset_mode"]
