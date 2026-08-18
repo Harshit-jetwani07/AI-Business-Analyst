@@ -9,7 +9,7 @@ from utils.auth import (
     get_conn, log_activity, authenticate, create_user, hash_password,
     get_login_lock, record_login_failure, clear_login_failures
 )
-from utils.branding import BRAND_NAME, brand_logo_data_uri
+from utils.branding import BRAND_NAME, BRAND_TAGLINE, brand_logo_data_uri
 
 
 def password_strength(password: str) -> tuple[int, str]:
@@ -106,7 +106,10 @@ def show_login_page():
 
     def brand_header(title: str, subtitle: str) -> str:
         return (
+            '<div class="brand-lockup">'
             f'<div class="brand-logo"><img src="{logo_data_uri}" alt="{BRAND_NAME} logo"></div>'
+            f'<div class="brand-kicker">{BRAND_TAGLINE}</div>'
+            '</div>'
             f'<div class="login-title">{title}</div>'
             f'<div class="login-sub">{subtitle}</div>'
         )
@@ -118,31 +121,53 @@ def show_login_page():
     .block-container { padding-top: 5rem !important; }
     
     div[data-testid="stVerticalBlock"] > div:has(.custom-login-box) {
-        background: linear-gradient(160deg, #0f0f2a 0%, #14142e 100%) !important;
-        border: 1px solid #2a2a5a !important;
-        border-radius: 16px !important;
-        padding: 35px 30px !important;
-        max-width: 400px !important;
+        background:
+            radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.16), transparent 34%),
+            linear-gradient(160deg, #0f0f2a 0%, #14142e 100%) !important;
+        border: 1px solid rgba(0, 212, 255, 0.22) !important;
+        border-radius: 18px !important;
+        padding: 34px 30px !important;
+        max-width: 430px !important;
         margin: 0 auto !important;
-        box-shadow: 0 10px 40px rgba(124, 106, 247, 0.15) !important;
+        box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42), 0 0 42px rgba(0, 102, 255, 0.12) !important;
     }
+    .custom-login-box { display: none !important; }
     .login-logo { font-size: 2.8rem; text-align: center; margin-bottom: 5px; }
+    .brand-lockup {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 18px;
+    }
     .brand-logo {
-        width: 230px;
-        height: 72px;
-        margin: 0 auto 14px auto;
+        width: min(100%, 310px);
+        min-height: 86px;
+        margin: 0 auto;
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 12px 18px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(214,236,255,0.9));
+        border: 1px solid rgba(0, 212, 255, 0.35);
+        box-shadow: 0 14px 36px rgba(0, 212, 255, 0.18), inset 0 1px 0 rgba(255,255,255,0.95);
     }
     .brand-logo img {
-        max-width: 230px;
-        max-height: 72px;
+        width: 100%;
+        max-height: 68px;
         object-fit: contain;
-        filter: drop-shadow(0 8px 26px rgba(0, 212, 255, 0.25));
+        filter: drop-shadow(0 8px 16px rgba(0, 28, 80, 0.18));
     }
-    .login-title { text-align: center; font-size: 1.65rem; font-weight: 700; color: #a090f7; margin-bottom: 2px; }
-    .login-sub { text-align: center; color: #6060a0; font-size: 0.88rem; margin-bottom: 20px; }
+    .brand-kicker {
+        text-align: center;
+        color: #3ee7ff;
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0;
+    }
+    .login-title { text-align: center; font-size: 1.85rem; font-weight: 800; color: #c8bcff; margin-bottom: 2px; }
+    .login-sub { text-align: center; color: #8d88c7; font-size: 0.92rem; margin-bottom: 22px; }
     .stTextInput > div > div > input { background: #12122a !important; border: 1px solid #2a2a5a !important; color: #e0e0ff !important; border-radius: 8px !important; }
     
     div[data-testid="stForm"] { border: none !important; padding: 0 !important; background: transparent !important; }

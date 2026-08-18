@@ -14,6 +14,7 @@ BRAND_SHORT_DESCRIPTION = (
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 BRAND_LOGO_PATH = PROJECT_ROOT / "assets" / "bizvision-logo.png"
+BRAND_FAVICON_PATH = PROJECT_ROOT / "assets" / "bizvision-favicon.png"
 
 
 @lru_cache(maxsize=1)

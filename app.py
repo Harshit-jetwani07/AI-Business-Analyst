@@ -19,7 +19,13 @@ from utils.ai_agent import AIAgent
 from utils.report_generator import ReportGenerator
 from utils.visualizer import Visualizer
 from utils.data_quality import evaluate_dataset_quality, detect_anomalies
-from utils.branding import BRAND_LOGO_PATH, BRAND_NAME, BRAND_SHORT_DESCRIPTION, BRAND_TAGLINE
+from utils.branding import (
+    BRAND_FAVICON_PATH,
+    BRAND_NAME,
+    BRAND_SHORT_DESCRIPTION,
+    BRAND_TAGLINE,
+    brand_logo_data_uri,
+)
 
 MAX_UPLOAD_MB = int(os.getenv("MAX_UPLOAD_MB", "25"))
 MAX_DATASET_ROWS = int(os.getenv("MAX_DATASET_ROWS", "100000"))
@@ -220,7 +226,7 @@ def make_unique_columns(columns):
 #  Page config 
 st.set_page_config(
     page_title=BRAND_NAME,
-    page_icon=str(BRAND_LOGO_PATH),
+    page_icon=str(BRAND_FAVICON_PATH),
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -377,6 +383,61 @@ st.markdown("""
     [data-testid="stDataFrame"] {
         border: 1px solid #2a2a5a;
         border-radius: 8px;
+    }
+    .brand-hero {
+        display: grid;
+        grid-template-columns: minmax(230px, 340px) 1fr;
+        gap: 26px;
+        align-items: center;
+        padding: 22px 24px;
+        margin: 2px 0 18px 0;
+        border-radius: 18px;
+        border: 1px solid rgba(0, 212, 255, 0.22);
+        background:
+            radial-gradient(circle at 0% 0%, rgba(0, 212, 255, 0.14), transparent 32%),
+            linear-gradient(135deg, rgba(18, 18, 42, 0.98), rgba(7, 7, 15, 0.96));
+        box-shadow: 0 20px 60px rgba(0,0,0,0.28);
+    }
+    .brand-hero-logo {
+        min-height: 96px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 14px 18px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(214,236,255,0.9));
+        border: 1px solid rgba(0, 212, 255, 0.35);
+        box-shadow: 0 14px 36px rgba(0, 212, 255, 0.15);
+    }
+    .brand-hero-logo img {
+        width: 100%;
+        max-height: 74px;
+        object-fit: contain;
+    }
+    .brand-hero h1 {
+        color: #f7f7ff;
+        font-size: 2.35rem;
+        line-height: 1.08;
+        margin: 0 0 8px 0;
+    }
+    .brand-hero .tagline {
+        color: #41e9ff;
+        font-weight: 800;
+        font-size: 1rem;
+        margin: 0 0 8px 0;
+    }
+    .brand-hero .desc {
+        color: #aaa7d8;
+        font-size: 0.98rem;
+        line-height: 1.5;
+        margin: 0;
+    }
+    @media (max-width: 760px) {
+        .brand-hero {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+        .brand-hero h1 { font-size: 1.9rem; }
     }
     hr { border-color: #2a2a5a; }
     #MainMenu { visibility: hidden; }
@@ -544,19 +605,21 @@ if selected_page == "Admin Panel":
     st.stop()
 
 #  Dashboard View Panel 
-header_logo, header_copy = st.columns([1, 5])
-with header_logo:
-    st.image(str(BRAND_LOGO_PATH), use_container_width=True)
-with header_copy:
-    st.markdown(f"# {BRAND_NAME}")
-    st.markdown(
-        f"<p style='color:#a090f7;margin-top:-10px;font-weight:600;'>{BRAND_TAGLINE}</p>",
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        f"<p style='color:#7070a0;margin-top:-8px;'>{BRAND_SHORT_DESCRIPTION}</p>",
-        unsafe_allow_html=True,
-    )
+st.markdown(
+    f"""
+    <div class="brand-hero">
+        <div class="brand-hero-logo">
+            <img src="{brand_logo_data_uri()}" alt="{BRAND_NAME} logo">
+        </div>
+        <div>
+            <h1>{BRAND_NAME}</h1>
+            <p class="tagline">{BRAND_TAGLINE}</p>
+            <p class="desc">{BRAND_SHORT_DESCRIPTION}</p>
+        </div>
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 st.info("Upload any CSV or Excel business dataset to generate AI-powered insights instantly.")
 st.markdown("### 📤 Upload Your Business Data")
