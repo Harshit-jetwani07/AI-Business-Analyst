@@ -101,7 +101,441 @@ def mask_email(email: str) -> str:
 
 
 def show_login_page():
-    """Render login screen with pixel-perfect center-aligned actions."""
+    """Render the logged-out landing page and secondary auth step."""
+    view_param = st.query_params.get("view", "") if hasattr(st, "query_params") else ""
+    auth_param = st.query_params.get("auth", "") if hasattr(st, "query_params") else ""
+    if view_param == "landing":
+        st.session_state["landing_auth_mode"] = False
+        st.session_state["reset_mode"] = "login"
+        if hasattr(st, "query_params"):
+            st.query_params.clear()
+        st.rerun()
+
+    if auth_param in {"login", "register"} and not st.session_state.get("landing_auth_mode"):
+        st.session_state["landing_auth_mode"] = True
+        st.session_state["reset_mode"] = "register" if auth_param == "register" else "login"
+
+    if not st.session_state.get("landing_auth_mode", False):
+        show_landing_page()
+        return
+
+    show_auth_step()
+
+
+def show_landing_page():
+    """Render premium scrollable marketing landing page for logged-out users."""
+    logo_data_uri = brand_logo_data_uri()
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    html { scroll-behavior: smooth; }
+    .stApp {
+        background:
+            linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px),
+            radial-gradient(circle at 18% 12%, rgba(69, 98, 255, 0.22), transparent 34%),
+            radial-gradient(circle at 82% 8%, rgba(124, 58, 237, 0.18), transparent 34%),
+            linear-gradient(135deg, #070b15 0%, #0a0e1a 48%, #131826 100%) !important;
+        background-size: 42px 42px, 42px 42px, auto, auto, auto !important;
+        color: #f7fbff;
+    }
+    [data-testid="stSidebar"] { display: none !important; }
+    .block-container {
+        max-width: 100% !important;
+        padding: 0 !important;
+    }
+    .bv-page {
+        font-family: 'Inter', system-ui, sans-serif;
+        overflow: hidden;
+    }
+    .bv-nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 14px clamp(20px, 5vw, 72px);
+        background: rgba(8, 13, 31, 0.76);
+        border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+        backdrop-filter: blur(18px);
+    }
+    .bv-brand { display: flex; align-items: center; gap: 12px; min-width: 210px; }
+    .bv-brand img { width: 158px; height: auto; display: block; }
+    .bv-links { display: flex; align-items: center; justify-content: center; gap: 26px; flex: 1; }
+    .bv-links a {
+        color: #aeb9d8;
+        text-decoration: none;
+        font-size: 0.94rem;
+        font-weight: 650;
+        transition: color .2s ease;
+    }
+    .bv-links a:hover { color: #ffffff; }
+    .bv-nav-actions { display: flex; gap: 10px; align-items: center; }
+    .bv-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 44px;
+        padding: 0 18px;
+        border-radius: 12px;
+        color: #ffffff !important;
+        text-decoration: none !important;
+        font-weight: 800;
+        border: 1px solid rgba(148, 163, 184, 0.22);
+        background: rgba(255,255,255,0.06);
+        transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+    }
+    .bv-btn:hover { transform: translateY(-2px); border-color: rgba(0, 212, 255, .55); }
+    .bv-btn.primary {
+        border: 0;
+        background: linear-gradient(135deg, #7c3cff 0%, #2f6bff 48%, #00d4ff 100%);
+        box-shadow: 0 16px 38px rgba(47, 107, 255, 0.28);
+    }
+    .bv-section {
+        padding: clamp(56px, 7vw, 96px) clamp(20px, 5vw, 72px);
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+    .bv-hero {
+        min-height: 720px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.04fr) minmax(420px, .96fr);
+        gap: clamp(34px, 5vw, 70px);
+        align-items: center;
+        position: relative;
+    }
+    .bv-eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #67e8f9;
+        background: rgba(0, 212, 255, 0.09);
+        border: 1px solid rgba(0, 212, 255, 0.26);
+        border-radius: 999px;
+        padding: 8px 13px;
+        font-weight: 800;
+        font-size: .82rem;
+        margin-bottom: 18px;
+    }
+    .bv-hero h1 {
+        margin: 0;
+        max-width: 780px;
+        color: #ffffff;
+        font-size: clamp(3rem, 5.4vw, 5.95rem);
+        line-height: .96;
+        letter-spacing: -0.04em;
+        font-weight: 900;
+    }
+    .bv-gradient-text {
+        background: linear-gradient(135deg, #ffffff 0%, #8fdfff 48%, #9b6cff 100%);
+        -webkit-background-clip: text;
+        color: transparent;
+    }
+    .bv-subhead {
+        max-width: 650px;
+        margin: 24px 0 0;
+        color: #aeb9d8;
+        font-size: clamp(1.05rem, 1.7vw, 1.24rem);
+        line-height: 1.68;
+    }
+    .bv-hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 34px; }
+    .bv-mini-proof { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; color: #ccd6f6; }
+    .bv-mini-proof span {
+        border: 1px solid rgba(148, 163, 184, .16);
+        background: rgba(255,255,255,.045);
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-size: .86rem;
+        font-weight: 700;
+    }
+    .bv-dashboard {
+        position: relative;
+        border: 1px solid rgba(148, 163, 184, 0.18);
+        border-radius: 26px;
+        background: linear-gradient(145deg, rgba(20, 29, 58, .88), rgba(7, 11, 25, .92));
+        box-shadow: 0 34px 90px rgba(0,0,0,.42), 0 0 64px rgba(47,107,255,.13);
+        padding: 18px;
+        min-height: 440px;
+        overflow: hidden;
+    }
+    .bv-browser-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 18px; }
+    .bv-dot { width: 11px; height: 11px; border-radius: 50%; background: #ef4444; }
+    .bv-dot:nth-child(2) { background: #f59e0b; }
+    .bv-dot:nth-child(3) { background: #10b981; }
+    .bv-preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .bv-preview-card {
+        border: 1px solid rgba(148, 163, 184, .16);
+        background: rgba(255,255,255,.055);
+        border-radius: 18px;
+        padding: 16px;
+        min-height: 110px;
+    }
+    .bv-preview-card.wide { grid-column: 1 / -1; min-height: 176px; }
+    .bv-label { color: #8b98bb; font-size: .78rem; font-weight: 800; text-transform: uppercase; }
+    .bv-value { color: #ffffff; font-size: 1.62rem; font-weight: 900; margin-top: 8px; }
+    .bv-chip { color: #50f0c8; font-size: .82rem; margin-top: 5px; font-weight: 800; }
+    .bv-chart { height: 112px; margin-top: 12px; display: flex; align-items: flex-end; gap: 10px; }
+    .bv-bar {
+        flex: 1;
+        min-height: 22px;
+        border-radius: 10px 10px 4px 4px;
+        background: linear-gradient(180deg, #00d4ff, #7c3cff);
+        animation: bvPulse 2.6s ease-in-out infinite;
+    }
+    .bv-line {
+        height: 128px;
+        margin-top: 12px;
+        border-radius: 16px;
+        background:
+            linear-gradient(135deg, transparent 0 18%, rgba(0,212,255,.75) 19% 21%, transparent 22% 38%, rgba(124,60,255,.85) 39% 41%, transparent 42% 58%, rgba(0,212,255,.75) 59% 61%, transparent 62%),
+            linear-gradient(rgba(255,255,255,.065) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,.065) 1px, transparent 1px);
+        background-size: auto, 34px 34px, 34px 34px;
+        background-color: rgba(8,13,31,.62);
+    }
+    @keyframes bvPulse { 0%,100% { opacity:.72; transform: scaleY(.88); } 50% { opacity:1; transform: scaleY(1); } }
+    .bv-stats {
+        max-width: 1280px;
+        margin: -32px auto 0;
+        padding: 0 clamp(20px, 5vw, 72px) 34px;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+    }
+    .bv-stat {
+        border: 1px solid rgba(148, 163, 184, .15);
+        border-radius: 18px;
+        background: rgba(255,255,255,.055);
+        backdrop-filter: blur(14px);
+        padding: 20px;
+        box-shadow: 0 18px 44px rgba(0,0,0,.18);
+    }
+    .bv-stat strong { display:block; color:#fff; font-size: clamp(1.35rem, 2.8vw, 2.25rem); font-weight: 900; }
+    .bv-stat span { color:#95a3c7; font-weight: 700; font-size: .9rem; }
+    .bv-section-title { text-align: center; max-width: 760px; margin: 0 auto 34px; }
+    .bv-section-title h2 { margin:0; font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1.05; color:#fff; letter-spacing: -0.035em; }
+    .bv-section-title p { color:#aeb9d8; font-size: 1.05rem; line-height:1.65; margin: 16px 0 0; }
+    .bv-feature-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .bv-feature, .bv-quote {
+        border: 1px solid rgba(148, 163, 184, .15);
+        border-radius: 22px;
+        padding: 24px;
+        background: linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.035));
+        min-height: 190px;
+        transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+    }
+    .bv-feature:hover, .bv-quote:hover {
+        transform: translateY(-6px);
+        border-color: rgba(0, 212, 255, .36);
+        box-shadow: 0 22px 56px rgba(0,0,0,.24);
+    }
+    .bv-icon {
+        width: 46px;
+        height: 46px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #7c3cff, #00d4ff);
+        font-size: 1.35rem;
+        margin-bottom: 18px;
+    }
+    .bv-feature h3 { margin:0 0 10px; color:#fff; font-size:1.15rem; }
+    .bv-feature p, .bv-step p, .bv-quote p { color:#aeb9d8; line-height:1.55; margin:0; }
+    .bv-timeline { display:grid; grid-template-columns: repeat(4, 1fr); gap: 16px; position:relative; }
+    .bv-step {
+        border: 1px solid rgba(148, 163, 184, .15);
+        border-radius: 22px;
+        background: rgba(255,255,255,.052);
+        padding: 24px;
+    }
+    .bv-step-num { color:#67e8f9; font-size:.85rem; font-weight:900; margin-bottom:10px; }
+    .bv-step h3 { color:#fff; margin:0 0 8px; }
+    .bv-product-frame {
+        border: 1px solid rgba(148, 163, 184, .18);
+        border-radius: 28px;
+        background: linear-gradient(145deg, rgba(21, 29, 58, .92), rgba(8, 13, 31, .94));
+        box-shadow: 0 30px 80px rgba(0,0,0,.34);
+        padding: 18px;
+    }
+    .bv-product-layout { display:grid; grid-template-columns: 220px 1fr; gap: 16px; }
+    .bv-side { border-radius: 20px; background: rgba(255,255,255,.05); padding: 16px; }
+    .bv-side div { height: 12px; border-radius: 99px; background: rgba(174,185,216,.22); margin: 14px 0; }
+    .bv-main-preview { display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .bv-main-preview .bv-preview-card:nth-child(4) { grid-column: 1 / 3; }
+    .bv-main-preview .bv-preview-card:nth-child(5) { grid-column: 3; }
+    .bv-stack-row { display:flex; flex-wrap:wrap; gap: 12px; justify-content:center; }
+    .bv-badge {
+        border:1px solid rgba(148,163,184,.16);
+        border-radius:999px;
+        padding: 11px 15px;
+        color:#dbeafe;
+        background: rgba(255,255,255,.055);
+        font-weight:800;
+    }
+    .bv-quotes { display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; }
+    .bv-quote strong { display:block; color:#fff; margin-top: 16px; }
+    .bv-final {
+        max-width: none;
+        margin-top: 32px;
+        background: linear-gradient(135deg, rgba(124,60,255,.92), rgba(47,107,255,.92), rgba(0,212,255,.78));
+        text-align:center;
+        padding: 80px 24px;
+    }
+    .bv-final h2 { color:#fff; font-size: clamp(2.2rem, 5vw, 4.2rem); margin:0 0 16px; letter-spacing:-.04em; }
+    .bv-final p { color:rgba(255,255,255,.88); font-size:1.1rem; margin: 0 0 28px; }
+    .bv-footer {
+        padding: 36px clamp(20px, 5vw, 72px);
+        border-top: 1px solid rgba(148,163,184,.14);
+        color:#8b98bb;
+        display:flex;
+        justify-content:space-between;
+        gap:24px;
+        flex-wrap:wrap;
+    }
+    .bv-footer img { width: 150px; }
+    .bv-footer a { color:#aeb9d8; margin-left:18px; text-decoration:none; font-weight:700; }
+    @media (max-width: 980px) {
+        .bv-links { display:none; }
+        .bv-hero { grid-template-columns: 1fr; min-height: auto; padding-top: 40px; }
+        .bv-dashboard { min-height: auto; }
+        .bv-stats, .bv-feature-grid, .bv-timeline, .bv-quotes { grid-template-columns: repeat(2, 1fr); }
+        .bv-product-layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+        .bv-nav { align-items:flex-start; flex-direction:column; }
+        .bv-nav-actions { width:100%; }
+        .bv-nav-actions .bv-btn { flex:1; }
+        .bv-hero-actions .bv-btn { width:100%; }
+        .bv-preview-grid, .bv-stats, .bv-feature-grid, .bv-timeline, .bv-quotes, .bv-main-preview { grid-template-columns: 1fr; }
+        .bv-main-preview .bv-preview-card:nth-child(4), .bv-main-preview .bv-preview-card:nth-child(5) { grid-column:auto; }
+        .bv-footer { flex-direction:column; }
+        .bv-footer a { margin: 0 14px 0 0; }
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    st.markdown(f"""
+    <div class="bv-page">
+      <nav class="bv-nav">
+        <div class="bv-brand"><img src="{logo_data_uri}" alt="{BRAND_NAME} logo"></div>
+        <div class="bv-links">
+          <a href="#features">Features</a>
+          <a href="#how">How it Works</a>
+          <a href="#preview">Preview</a>
+          <a href="#docs">Docs</a>
+        </div>
+        <div class="bv-nav-actions">
+          <a class="bv-btn" href="?auth=login">Sign In</a>
+          <a class="bv-btn primary" href="?auth=register">Get Started</a>
+        </div>
+      </nav>
+
+      <section class="bv-section bv-hero">
+        <div>
+          <div class="bv-eyebrow">AI analytics workspace for business data</div>
+          <h1>Turn Your Business Data Into <span class="bv-gradient-text">Instant AI Insights</span></h1>
+          <p class="bv-subhead">{BRAND_NAME} converts CSV and Excel files into dashboards, quality scores, forecasts, anomaly alerts, AI answers, and export-ready PDF reports.</p>
+          <div class="bv-hero-actions">
+            <a class="bv-btn primary" href="?auth=register">Get Started Free</a>
+            <a class="bv-btn" href="?auth=login">Sign In</a>
+          </div>
+          <div class="bv-mini-proof">
+            <span>Smart parser</span><span>AI chat</span><span>Forecasting</span><span>Admin approvals</span>
+          </div>
+        </div>
+        <div class="bv-dashboard" aria-label="BizVision AI dashboard preview">
+          <div class="bv-browser-bar"><span class="bv-dot"></span><span class="bv-dot"></span><span class="bv-dot"></span></div>
+          <div class="bv-preview-grid">
+            <div class="bv-preview-card"><div class="bv-label">Data Quality</div><div class="bv-value">94/100</div><div class="bv-chip">Ready for reporting</div></div>
+            <div class="bv-preview-card"><div class="bv-label">Forecast Trend</div><div class="bv-value">+18.7%</div><div class="bv-chip">Next period growth</div></div>
+            <div class="bv-preview-card wide"><div class="bv-label">Revenue Momentum</div><div class="bv-chart"><span class="bv-bar" style="height:42%"></span><span class="bv-bar" style="height:58%"></span><span class="bv-bar" style="height:46%"></span><span class="bv-bar" style="height:72%"></span><span class="bv-bar" style="height:64%"></span><span class="bv-bar" style="height:88%"></span><span class="bv-bar" style="height:78%"></span></div></div>
+            <div class="bv-preview-card wide"><div class="bv-label">AI Insight Path</div><div class="bv-line"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <div class="bv-stats">
+        <div class="bv-stat"><strong>10,000+</strong><span>Rows analyzed per session</span></div>
+        <div class="bv-stat"><strong>99.9%</strong><span>Demo-ready uptime target</span></div>
+        <div class="bv-stat"><strong>4</strong><span>AI providers supported</span></div>
+        <div class="bv-stat"><strong>Live</strong><span>Real-time business insights</span></div>
+      </div>
+
+      <section class="bv-section" id="features">
+        <div class="bv-section-title"><h2>Everything needed for a complete analytics flow</h2><p>From messy uploads to governed reports, BizVision AI covers the parts most dashboards skip.</p></div>
+        <div class="bv-feature-grid">
+          <div class="bv-feature"><div class="bv-icon">01</div><h3>Smart CSV/Excel Parser</h3><p>Detects headers, cleans blank wrappers, handles dates, currency, percentages, and horizontal matrix layouts.</p></div>
+          <div class="bv-feature"><div class="bv-icon">02</div><h3>AI Chat Insights</h3><p>Ask natural-language questions over dataset summaries and get business-ready answers.</p></div>
+          <div class="bv-feature"><div class="bv-icon">03</div><h3>Data Quality Scoring</h3><p>Automatically flags missing values, duplicates, risky structures, and readiness grade.</p></div>
+          <div class="bv-feature"><div class="bv-icon">04</div><h3>Forecasting</h3><p>Trend analysis with future projections, MAE/RMSE metrics, and direction indicators.</p></div>
+          <div class="bv-feature"><div class="bv-icon">05</div><h3>Anomaly Detection</h3><p>Isolation Forest highlights unusual business records and suspicious numeric patterns.</p></div>
+          <div class="bv-feature"><div class="bv-icon">06</div><h3>PDF Reports</h3><p>Generate export-ready business reports with charts, AI summaries, and admin approval workflow.</p></div>
+        </div>
+      </section>
+
+      <section class="bv-section" id="how">
+        <div class="bv-section-title"><h2>How it works</h2><p>A clean four-step workflow for business users, students, and teams.</p></div>
+        <div class="bv-timeline">
+          <div class="bv-step"><div class="bv-step-num">STEP 01</div><h3>Upload Data</h3><p>Drop in CSV or Excel files and let the parser normalize the dataset.</p></div>
+          <div class="bv-step"><div class="bv-step-num">STEP 02</div><h3>AI Analyzes</h3><p>Quality, summaries, patterns, charts, anomalies, and forecasts are generated.</p></div>
+          <div class="bv-step"><div class="bv-step-num">STEP 03</div><h3>Get Insights</h3><p>Use dashboards and AI chat to explain what is happening in the business.</p></div>
+          <div class="bv-step"><div class="bv-step-num">STEP 04</div><h3>Export Report</h3><p>Create PDF reports and route outputs through admin governance.</p></div>
+        </div>
+      </section>
+
+      <section class="bv-section" id="preview">
+        <div class="bv-section-title"><h2>Live product preview</h2><p>A dashboard-style workspace with charts, quality metrics, usage controls, and insight generation.</p></div>
+        <div class="bv-product-frame">
+          <div class="bv-browser-bar"><span class="bv-dot"></span><span class="bv-dot"></span><span class="bv-dot"></span></div>
+          <div class="bv-product-layout">
+            <div class="bv-side"><div style="width:70%"></div><div></div><div style="width:84%"></div><div style="width:58%"></div><div style="width:76%"></div><div style="width:64%"></div></div>
+            <div class="bv-main-preview">
+              <div class="bv-preview-card"><div class="bv-label">Rows</div><div class="bv-value">18.4K</div><div class="bv-chip">Parsed</div></div>
+              <div class="bv-preview-card"><div class="bv-label">Charts</div><div class="bv-value">12</div><div class="bv-chip">Auto-generated</div></div>
+              <div class="bv-preview-card"><div class="bv-label">Reports</div><div class="bv-value">PDF</div><div class="bv-chip">Ready</div></div>
+              <div class="bv-preview-card wide"><div class="bv-label">Performance Chart</div><div class="bv-line"></div></div>
+              <div class="bv-preview-card"><div class="bv-label">AI Summary</div><p style="color:#dbeafe;line-height:1.55;margin-top:12px">Sales momentum increased in West region while returns need review in Electronics.</p></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bv-section" id="docs">
+        <div class="bv-section-title"><h2>Built on a credible stack</h2><p>Lightweight, explainable, and ready for college demos or production extension.</p></div>
+        <div class="bv-stack-row">
+          <span class="bv-badge">Streamlit</span><span class="bv-badge">OpenAI</span><span class="bv-badge">Gemini</span><span class="bv-badge">Groq</span><span class="bv-badge">Python</span><span class="bv-badge">Plotly</span>
+        </div>
+      </section>
+
+      <section class="bv-section">
+        <div class="bv-section-title"><h2>Social proof</h2><p>Placeholder quotes for you to edit before final submission.</p></div>
+        <div class="bv-quotes">
+          <div class="bv-quote"><p>"BizVision AI helped me explain raw sales data like a complete business intelligence workflow."</p><strong>Placeholder Student</strong></div>
+          <div class="bv-quote"><p>"The dashboard feels practical because it includes quality checks, forecasting, and reports."</p><strong>Placeholder Reviewer</strong></div>
+          <div class="bv-quote"><p>"A strong demo for showing how AI can support real business analysis decisions."</p><strong>Placeholder Mentor</strong></div>
+        </div>
+      </section>
+
+      <section class="bv-final">
+        <h2>Start Analyzing Your Data Today</h2>
+        <p>Upload a file, ask questions, detect patterns, forecast trends, and export your report.</p>
+        <a class="bv-btn primary" href="?auth=register">Get Started Free</a>
+      </section>
+
+      <footer class="bv-footer">
+        <div><img src="{logo_data_uri}" alt="{BRAND_NAME} logo"><div>{BRAND_TAGLINE}</div></div>
+        <div><a href="#features">Features</a><a href="#how">Workflow</a><a href="#preview">Preview</a><a href="?auth=login">Sign In</a></div>
+        <div>Copyright 2026 BizVision AI. All rights reserved.</div>
+      </footer>
+    </div>
+    """, unsafe_allow_html=True)
+
+
+def show_auth_step():
+    """Render the clean centered auth form after a landing CTA is clicked."""
     logo_data_uri = brand_logo_data_uri()
 
     def brand_header(title: str, subtitle: str) -> str:
@@ -116,9 +550,26 @@ def show_login_page():
 
     st.markdown("""
     <style>
-    .stApp { background: #07070f !important; }
+    .stApp {
+        background:
+            linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px),
+            radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.18), transparent 34%),
+            linear-gradient(135deg, #070b15 0%, #0a0e1a 48%, #131826 100%) !important;
+        background-size: 42px 42px, 42px 42px, auto, auto !important;
+    }
     [data-testid="stSidebar"] { display: none !important; }
-    .block-container { padding-top: 5rem !important; }
+    .block-container { padding-top: 2.4rem !important; max-width: 100% !important; }
+    .auth-shell {
+        width: min(100%, 1040px);
+        margin: 0 auto 22px;
+        padding: 0 24px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: #aeb9d8;
+    }
+    .auth-shell a { color: #67e8f9; text-decoration: none; font-weight: 800; }
     
     div[data-testid="stVerticalBlock"] > div:has(.custom-login-box) {
         background:
@@ -211,6 +662,11 @@ def show_login_page():
     }
     </style>
     """, unsafe_allow_html=True)
+
+    st.markdown(
+        '<div class="auth-shell"><a href="?view=landing">Back to landing</a><span>Secure BizVision AI workspace access</span></div>',
+        unsafe_allow_html=True,
+    )
 
     # State routers initializations
     if "reset_mode" not in st.session_state:

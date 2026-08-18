@@ -20,10 +20,10 @@ from utils.report_generator import ReportGenerator
 from utils.visualizer import Visualizer
 from utils.data_quality import evaluate_dataset_quality, detect_anomalies
 from utils.branding import (
-    BRAND_FAVICON_PATH,
     BRAND_NAME,
     BRAND_SHORT_DESCRIPTION,
     BRAND_TAGLINE,
+    brand_favicon_data_uri,
     brand_logo_data_uri,
 )
 
@@ -226,7 +226,7 @@ def make_unique_columns(columns):
 #  Page config 
 st.set_page_config(
     page_title=BRAND_NAME,
-    page_icon=str(BRAND_FAVICON_PATH),
+    page_icon=brand_favicon_data_uri(),
     layout="wide",
     initial_sidebar_state="expanded",
 )
