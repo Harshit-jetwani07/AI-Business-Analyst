@@ -1,6 +1,8 @@
-# AI Business Analyst
+# BizVision AI
 
-An end-to-end AI-powered business analytics platform built with Streamlit, Python, Pandas, Plotly, SQLite, and OpenAI/Ollama-compatible AI workflows.
+Business performance ko analyze karne wali intelligent vision.
+
+BizVision AI is an end-to-end AI-powered business analytics platform built with Streamlit, Python, Pandas, Plotly, SQLite, and OpenAI/Ollama-compatible AI workflows.
 
 ## Live Demo
 
@@ -76,8 +78,8 @@ python -m compileall app.py pages utils scripts tests
 ## Docker
 
 ```bash
-docker build -t ai-business-analyst .
-docker run -p 8501:8501 ai-business-analyst
+docker build -t bizvision-ai .
+docker run -p 8501:8501 bizvision-ai
 ```
 
 ## How To Use
@@ -159,7 +161,7 @@ Useful production environment variables:
 ## Project Structure
 
 ```text
-Ai_business_analyst/
+BizVision_AI/
 |-- app.py
 |-- requirements.txt
 |-- pages/

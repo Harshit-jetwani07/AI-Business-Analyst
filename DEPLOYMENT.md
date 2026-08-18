@@ -65,7 +65,7 @@ If Git is installed:
 ```bash
 git init
 git add .
-git commit -m "Initial AI Business Analyst demo"
+git commit -m "Initial BizVision AI demo"
 git branch -M main
 git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
 git push -u origin main
@@ -80,7 +80,7 @@ If Git is not installed, use GitHub web upload:
 
 ## Demo Video Script
 
-1. Introduce the app as an AI Business Analyst Platform.
+1. Introduce the app as BizVision AI.
 2. Login as `demouser`.
 3. Load sample dataset or upload CSV/Excel.
 4. Show quality score and overview.
@@ -93,9 +93,9 @@ If Git is not installed, use GitHub web upload:
 
 ## Submission Text Template
 
-Project Name: AI Business Analyst
+Project Name: BizVision AI
 
-Description: An AI-powered analytics platform that converts uploaded business datasets into dashboards, insights, forecasts, anomaly reports, admin approvals, and PDF business reports.
+Description: Business performance ko analyze karne wali intelligent vision. It converts uploaded business datasets into dashboards, insights, forecasts, anomaly reports, admin approvals, and PDF business reports.
 
 Tech Stack: Streamlit, Python, Pandas, Plotly, SQLite, scikit-learn, OpenAI/Ollama-compatible AI layer.
 

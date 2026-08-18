@@ -2,7 +2,7 @@
 
 ## 30-Second Introduction
 
-AI Business Analyst is an end-to-end business intelligence platform. A user can upload CSV or Excel data, and the app automatically parses the dataset, checks quality, generates dashboards, creates Plotly charts, answers business questions with AI, forecasts future trends, detects anomalies, and generates PDF reports. The admin panel adds governance through user management, dataset/report approvals, activity logs, and AI usage monitoring.
+BizVision AI is an end-to-end business intelligence platform for analyzing business performance with intelligent AI vision. A user can upload CSV or Excel data, and the app automatically parses the dataset, checks quality, generates dashboards, creates Plotly charts, answers business questions with AI, forecasts future trends, detects anomalies, and generates PDF reports. The admin panel adds governance through user management, dataset/report approvals, activity logs, and AI usage monitoring.
 
 ## Demo Flow
 

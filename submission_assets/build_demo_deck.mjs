@@ -8,10 +8,10 @@ const pptxgen = runtimeRequire("pptxgenjs");
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pptx = new pptxgen();
 pptx.layout = "LAYOUT_WIDE";
-pptx.author = "AI Business Analyst";
-pptx.company = "AI Business Analyst";
+pptx.author = "BizVision AI";
+pptx.company = "BizVision AI";
 pptx.subject = "AI-powered analytics demo";
-pptx.title = "AI Business Analyst Demo";
+pptx.title = "BizVision AI Demo";
 pptx.lang = "en-US";
 pptx.theme = {
   headFontFace: "Aptos Display",
@@ -84,7 +84,7 @@ function card(slide, heading, body, x, y, w, h, accent = C.purple) {
 }
 
 function footer(slide, n) {
-  slide.addText(`AI Business Analyst demo | ${n}`, {
+  slide.addText(`BizVision AI demo | ${n}`, {
     x: 10.6, y: 7.08, w: 2.2, h: 0.2,
     fontSize: 8.5, color: C.muted, align: "right", margin: 0,
   });
@@ -92,8 +92,8 @@ function footer(slide, n) {
 
 let s = pptx.addSlide();
 addBg(s);
-s.addText("AI Business Analyst", { x: 0.65, y: 1.1, w: 8.2, h: 0.62, fontSize: 39, bold: true, color: C.text, margin: 0 });
-s.addText("End-to-end platform for business data analysis, AI insights, forecasting, anomaly detection, admin approvals, and PDF reporting.", { x: 0.68, y: 1.95, w: 7.5, h: 0.85, fontSize: 18, color: C.muted, margin: 0.02, fit: "shrink" });
+s.addText("BizVision AI", { x: 0.65, y: 1.1, w: 8.2, h: 0.62, fontSize: 39, bold: true, color: C.text, margin: 0 });
+s.addText("Business performance ko analyze karne wali intelligent vision for AI insights, forecasting, anomaly detection, admin approvals, and PDF reporting.", { x: 0.68, y: 1.95, w: 7.5, h: 0.85, fontSize: 18, color: C.muted, margin: 0.02, fit: "shrink" });
 ["Streamlit", "Python", "Pandas", "Plotly", "SQLite", "OpenAI / Ollama"].forEach((t, i) => pill(s, t, 0.7 + (i % 3) * 2.15, 3.2 + Math.floor(i / 3) * 0.55, 1.85));
 card(s, "Demo Credentials", "Admin: admin / admin123\nUser: demouser / user123", 9.0, 1.0, 3.3, 1.7, C.green);
 card(s, "Core Value", "Turns uploaded business data into decision-ready insights, governed by an admin workflow.", 9.0, 3.0, 3.3, 1.7, C.purple);
@@ -170,5 +170,5 @@ card(s, "Documentation", "README.md, DEPLOYMENT.md, and DEMO_SCRIPT.md explain s
 card(s, "Next Production Upgrades", "Email/SMS OTP, cloud database, object storage, environment secrets, and LangChain/CrewAI orchestration.", 1.5, 4.15, 10.3, 1.25, C.purple);
 footer(s, 8);
 
-await pptx.writeFile({ fileName: path.join(__dirname, "AI_Business_Analyst_Demo.pptx") });
-console.log("Created AI_Business_Analyst_Demo.pptx");
+await pptx.writeFile({ fileName: path.join(__dirname, "BizVision_AI_Demo.pptx") });
+console.log("Created BizVision_AI_Demo.pptx");

@@ -19,6 +19,7 @@ from utils.ai_agent import AIAgent
 from utils.report_generator import ReportGenerator
 from utils.visualizer import Visualizer
 from utils.data_quality import evaluate_dataset_quality, detect_anomalies
+from utils.branding import BRAND_LOGO_PATH, BRAND_NAME, BRAND_SHORT_DESCRIPTION, BRAND_TAGLINE
 
 MAX_UPLOAD_MB = int(os.getenv("MAX_UPLOAD_MB", "25"))
 MAX_DATASET_ROWS = int(os.getenv("MAX_DATASET_ROWS", "100000"))
@@ -218,8 +219,8 @@ def make_unique_columns(columns):
 
 #  Page config 
 st.set_page_config(
-    page_title="AI Business Analyst",
-    page_icon="📊",
+    page_title=BRAND_NAME,
+    page_icon=str(BRAND_LOGO_PATH),
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -543,10 +544,21 @@ if selected_page == "Admin Panel":
     st.stop()
 
 #  Dashboard View Panel 
-st.markdown("# 📊 AI Business Analyst")
-st.markdown("<p style='color:#7070a0;margin-top:-10px;'>Upload data, get AI-powered insights, charts, and reports.</p>", unsafe_allow_html=True)
+header_logo, header_copy = st.columns([1, 5])
+with header_logo:
+    st.image(str(BRAND_LOGO_PATH), use_container_width=True)
+with header_copy:
+    st.markdown(f"# {BRAND_NAME}")
+    st.markdown(
+        f"<p style='color:#a090f7;margin-top:-10px;font-weight:600;'>{BRAND_TAGLINE}</p>",
+        unsafe_allow_html=True,
+    )
+    st.markdown(
+        f"<p style='color:#7070a0;margin-top:-8px;'>{BRAND_SHORT_DESCRIPTION}</p>",
+        unsafe_allow_html=True,
+    )
 
-st.info("📊 Upload any CSV or Excel business dataset to generate AI-powered insights instantly.")
+st.info("Upload any CSV or Excel business dataset to generate AI-powered insights instantly.")
 st.markdown("### 📤 Upload Your Business Data")
 
 uploaded_file = st.file_uploader(
@@ -918,7 +930,7 @@ else:
             rcol1, rcol2 = st.columns(2)
             with rcol1:
                 company_name = st.text_input("Company Name", value="Acme Corp")
-                analyst_name = st.text_input("Analyst Name", value="AI Business Analyst")
+                analyst_name = st.text_input("Analyst Name", value=BRAND_NAME)
             with rcol2:
                 report_title = st.text_input("Report Title", value="Business Intelligence Report")
                 report_date  = st.date_input("Report Date", value=datetime.today())

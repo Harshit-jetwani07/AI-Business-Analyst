@@ -9,6 +9,7 @@ from utils.auth import (
     get_conn, log_activity, authenticate, create_user, hash_password,
     get_login_lock, record_login_failure, clear_login_failures
 )
+from utils.branding import BRAND_NAME, brand_logo_data_uri
 
 
 def password_strength(password: str) -> tuple[int, str]:
@@ -59,14 +60,14 @@ def send_otp_email(to_email: str, username: str, otp: str) -> tuple[bool, str]:
         return False, "SMTP email settings are not configured."
 
     msg = EmailMessage()
-    msg["Subject"] = "AI Business Analyst password reset OTP"
+    msg["Subject"] = f"{BRAND_NAME} password reset OTP"
     msg["From"] = from_email
     msg["To"] = to_email
     msg.set_content(
         f"Hi {username},\n\n"
-        f"Your AI Business Analyst password reset OTP is: {otp}\n\n"
+        f"Your {BRAND_NAME} password reset OTP is: {otp}\n\n"
         "This code is valid for this reset session. If you did not request this, ignore this email.\n\n"
-        "AI Business Analyst"
+        f"{BRAND_NAME}"
     )
 
     try:
@@ -101,6 +102,15 @@ def mask_email(email: str) -> str:
 
 def show_login_page():
     """Render login screen with pixel-perfect center-aligned actions."""
+    logo_data_uri = brand_logo_data_uri()
+
+    def brand_header(title: str, subtitle: str) -> str:
+        return (
+            f'<div class="brand-logo"><img src="{logo_data_uri}" alt="{BRAND_NAME} logo"></div>'
+            f'<div class="login-title">{title}</div>'
+            f'<div class="login-sub">{subtitle}</div>'
+        )
+
     st.markdown("""
     <style>
     .stApp { background: #07070f !important; }
@@ -118,17 +128,18 @@ def show_login_page():
     }
     .login-logo { font-size: 2.8rem; text-align: center; margin-bottom: 5px; }
     .brand-logo {
-        width: 72px;
+        width: 230px;
         height: 72px;
-        border-radius: 18px;
         margin: 0 auto 14px auto;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: linear-gradient(135deg, #4a3fa0 0%, #7c6af7 100%);
-        color: #ffffff;
-        font-size: 2.2rem;
-        box-shadow: 0 8px 26px rgba(124, 106, 247, 0.3);
+    }
+    .brand-logo img {
+        max-width: 230px;
+        max-height: 72px;
+        object-fit: contain;
+        filter: drop-shadow(0 8px 26px rgba(0, 212, 255, 0.25));
     }
     .login-title { text-align: center; font-size: 1.65rem; font-weight: 700; color: #a090f7; margin-bottom: 2px; }
     .login-sub { text-align: center; color: #6060a0; font-size: 0.88rem; margin-bottom: 20px; }
@@ -189,7 +200,7 @@ def show_login_page():
         
         #  1 LOGIN VIEW MODE (CENTERED STRINGS) 
         if current_mode == "login":
-            st.markdown('<div class="brand-logo">📊</div><div class="login-title">AI Business Analyst</div><div class="login-sub">Sign in to continue</div>', unsafe_allow_html=True)
+            st.markdown(brand_header(BRAND_NAME, "Sign in to continue"), unsafe_allow_html=True)
             
             with st.form(key="form_execution_login_isolated"):
                 username_input = st.text_input("Username", placeholder="Enter username", key="login_username_widget")
@@ -237,7 +248,7 @@ def show_login_page():
 
         #  2 PUBLIC REGISTRATION VIEW MODE
         elif current_mode == "register":
-            st.markdown('<div class="brand-logo">📊</div><div class="login-title">Create Account</div><div class="login-sub">Start with a standard user workspace</div>', unsafe_allow_html=True)
+            st.markdown(brand_header("Create Account", "Start with a standard user workspace"), unsafe_allow_html=True)
 
             with st.form(key="form_execution_register_isolated"):
                 reg_username = st.text_input("Username", placeholder="e.g. harshit_data", key="register_username_widget")
@@ -314,7 +325,7 @@ def show_login_page():
 
         #  3 FORGOT VIEW MODE 
         elif current_mode == "forgot":
-            st.markdown('<div class="brand-logo">📊</div><div class="login-title">AI Business Analyst</div><div class="login-sub">Reset access securely</div>', unsafe_allow_html=True)
+            st.markdown(brand_header(BRAND_NAME, "Reset access securely"), unsafe_allow_html=True)
             
             with st.form(key="form_execution_forgot_isolated"):
                 target_user = st.text_input("Username or Email", placeholder="Enter your username or registered email", key="forgot_username_widget")
@@ -359,7 +370,7 @@ def show_login_page():
 
         elif current_mode == "verify_register":
             pending = st.session_state.get("pending_registration") or {}
-            st.markdown('<div class="brand-logo">📊</div><div class="login-title">Verify Email</div><div class="login-sub">Confirm ownership before account creation</div>', unsafe_allow_html=True)
+            st.markdown(brand_header("Verify Email", "Confirm ownership before account creation"), unsafe_allow_html=True)
             if pending.get("email"):
                 st.info(f"Enter the OTP sent to {mask_email(pending['email'])}.")
 
@@ -408,7 +419,7 @@ def show_login_page():
 
         #  4 VERIFY VIEW MODE 
         elif current_mode == "verify":
-            st.markdown('<div class="brand-logo">📊</div><div class="login-title">Security Key</div><div class="login-sub">Enter verification token</div>', unsafe_allow_html=True)
+            st.markdown(brand_header("Security Key", "Enter verification token"), unsafe_allow_html=True)
             
             if st.session_state.get("recovery_email"):
                 st.info(f"Enter the OTP sent to {mask_email(st.session_state.get('recovery_email'))}.")

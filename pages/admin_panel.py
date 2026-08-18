@@ -10,6 +10,7 @@ from utils.auth import (
     approve_dataset, reject_dataset, approve_report, reject_report,
     get_admin_metrics, get_user_activity, hash_password
 )
+from utils.branding import BRAND_NAME
 
 def show_admin_panel():
     #   NESTED SECURITY PRIVILEGE CHECK (SAME) 
@@ -381,7 +382,7 @@ def show_admin_panel():
 
     #  4. ADVANCED ANALYTICS CORE ENGINE CONTROLS (SAME)
     with tabs[3]:
-        st.markdown('<div class="panel-section-title">AI Business Analyst Processing Modules</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="panel-section-title">{BRAND_NAME} Processing Modules</div>', unsafe_allow_html=True)
         col_an1, col_an2 = st.columns(2)
         with col_an1:
             st.markdown('<div class="functional-card">', unsafe_allow_html=True)
