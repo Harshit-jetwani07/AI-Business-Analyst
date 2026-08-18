@@ -264,23 +264,36 @@ def show_landing_page():
     .bv-chart { height: 112px; margin-top: 12px; display: flex; align-items: flex-end; gap: 10px; }
     .bv-bar {
         flex: 1;
+        height: var(--h);
         min-height: 22px;
         border-radius: 10px 10px 4px 4px;
         background: linear-gradient(180deg, #00d4ff, #7c3cff);
-        animation: bvPulse 2.6s ease-in-out infinite;
+        transform-origin: bottom;
+        animation: bvGrow 1.15s cubic-bezier(.22, 1, .36, 1) both, bvGlow 3s ease-in-out infinite;
+        animation-delay: var(--d, 0ms);
     }
-    .bv-line {
-        height: 128px;
+    .bv-line-chart {
+        height: 138px;
         margin-top: 12px;
         border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid rgba(148, 163, 184, .12);
         background:
-            linear-gradient(135deg, transparent 0 18%, rgba(0,212,255,.75) 19% 21%, transparent 22% 38%, rgba(124,60,255,.85) 39% 41%, transparent 42% 58%, rgba(0,212,255,.75) 59% 61%, transparent 62%),
-            linear-gradient(rgba(255,255,255,.065) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,.065) 1px, transparent 1px);
-        background-size: auto, 34px 34px, 34px 34px;
-        background-color: rgba(8,13,31,.62);
+            linear-gradient(rgba(255,255,255,.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px),
+            rgba(8,13,31,.62);
+        background-size: 34px 34px;
     }
-    @keyframes bvPulse { 0%,100% { opacity:.72; transform: scaleY(.88); } 50% { opacity:1; transform: scaleY(1); } }
+    .bv-line-chart svg { width: 100%; height: 100%; display: block; }
+    .bv-line-chart path.main-line {
+        stroke-dasharray: 520;
+        stroke-dashoffset: 520;
+        animation: bvDraw 1.45s ease-out forwards;
+    }
+    .bv-line-chart .area { opacity: .22; }
+    @keyframes bvGrow { from { transform: scaleY(.08); opacity: .32; } to { transform: scaleY(1); opacity: 1; } }
+    @keyframes bvGlow { 0%,100% { filter: drop-shadow(0 0 0 rgba(0,212,255,0)); } 50% { filter: drop-shadow(0 0 10px rgba(0,212,255,.28)); } }
+    @keyframes bvDraw { to { stroke-dashoffset: 0; } }
     .bv-stats {
         max-width: 1280px;
         margin: -32px auto 0;
@@ -351,11 +364,11 @@ def show_landing_page():
     .bv-main-preview { display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
     .bv-main-preview .bv-preview-card:nth-child(4) { grid-column: 1 / 3; }
     .bv-main-preview .bv-preview-card:nth-child(5) { grid-column: 3; }
-    .bv-stack-row { display:flex; flex-wrap:wrap; gap: 12px; justify-content:center; }
+    .bv-security-row { display:flex; flex-wrap:wrap; gap: 12px; justify-content:center; }
     .bv-badge {
         border:1px solid rgba(148,163,184,.16);
         border-radius:999px;
-        padding: 11px 15px;
+        padding: 12px 16px;
         color:#dbeafe;
         background: rgba(255,255,255,.055);
         font-weight:800;
@@ -364,24 +377,109 @@ def show_landing_page():
     .bv-quote strong { display:block; color:#fff; margin-top: 16px; }
     .bv-final {
         max-width: none;
-        margin-top: 32px;
-        background: linear-gradient(135deg, rgba(124,60,255,.92), rgba(47,107,255,.92), rgba(0,212,255,.78));
+        position: relative;
+        overflow: hidden;
+        margin: 36px clamp(18px, 4vw, 58px) 0;
+        border-radius: 36px;
+        border: 1px solid rgba(255,255,255,.18);
+        background:
+            radial-gradient(circle at 50% 48%, rgba(255,255,255,.22), transparent 28%),
+            linear-gradient(115deg, rgba(124,60,255,.94), rgba(47,107,255,.94), rgba(0,212,255,.82));
         text-align:center;
-        padding: 80px 24px;
+        padding: 88px 24px;
+        box-shadow: 0 30px 90px rgba(47, 107, 255, .28);
     }
+    .bv-final::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: repeating-radial-gradient(circle at 30% 40%, rgba(255,255,255,.10) 0 1px, transparent 1px 7px);
+        opacity: .18;
+        pointer-events: none;
+    }
+    .bv-final::after {
+        content: "";
+        position: absolute;
+        inset: -40%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+        transform: rotate(12deg);
+        animation: bvShimmer 7s linear infinite;
+        pointer-events: none;
+    }
+    .bv-final h2, .bv-final p, .bv-final .bv-btn, .bv-final-trust { position: relative; z-index: 1; }
     .bv-final h2 { color:#fff; font-size: clamp(2.2rem, 5vw, 4.2rem); margin:0 0 16px; letter-spacing:-.04em; }
     .bv-final p { color:rgba(255,255,255,.88); font-size:1.1rem; margin: 0 0 28px; }
+    .bv-final .bv-btn.primary {
+        min-height: 52px;
+        padding: 0 28px;
+        box-shadow: 0 22px 46px rgba(0, 0, 0, .24), 0 0 36px rgba(255,255,255,.18);
+    }
+    .bv-final .bv-btn.primary:hover {
+        transform: translateY(-3px) scale(1.035);
+        box-shadow: 0 28px 60px rgba(0, 0, 0, .3), 0 0 48px rgba(255,255,255,.3);
+    }
+    .bv-final-trust {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 22px;
+        color: rgba(255,255,255,.9);
+        font-weight: 800;
+        font-size: .9rem;
+    }
+    .bv-final-trust span {
+        border: 1px solid rgba(255,255,255,.22);
+        border-radius: 999px;
+        background: rgba(4, 9, 24, .16);
+        padding: 8px 12px;
+    }
+    @keyframes bvShimmer { 0% { transform: translateX(-45%) rotate(12deg); } 100% { transform: translateX(45%) rotate(12deg); } }
     .bv-footer {
-        padding: 36px clamp(20px, 5vw, 72px);
-        border-top: 1px solid rgba(148,163,184,.14);
+        margin-top: 58px;
+        padding: 58px clamp(20px, 5vw, 72px) 28px;
+        border-top: 1px solid rgba(0,212,255,.2);
+        background:
+            radial-gradient(circle at 50% 0%, rgba(0,212,255,.08), transparent 34%),
+            #050814;
         color:#8b98bb;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .bv-footer-grid {
+        display: grid;
+        grid-template-columns: 1.45fr .75fr .75fr .75fr;
+        gap: 34px;
+        max-width: 1280px;
+        margin: 0 auto;
+    }
+    .bv-footer img { width: 164px; margin-bottom: 14px; }
+    .bv-footer p { color:#9aa8cc; line-height: 1.65; margin: 10px 0 16px; max-width: 360px; }
+    .bv-footer h4 { color:#ffffff; margin:0 0 14px; font-size: .95rem; }
+    .bv-footer a { display:block; color:#aeb9d8; text-decoration:none; font-weight:700; margin: 10px 0; }
+    .bv-footer a:hover { color:#67e8f9; }
+    .bv-socials { display:flex; gap:10px; }
+    .bv-socials a {
+        width:34px;
+        height:34px;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        border-radius: 10px;
+        border:1px solid rgba(148,163,184,.18);
+        background:rgba(255,255,255,.045);
+        margin:0;
+    }
+    .bv-footer-bottom {
+        max-width: 1280px;
+        margin: 34px auto 0;
+        padding-top: 20px;
+        border-top: 1px solid rgba(148,163,184,.13);
         display:flex;
         justify-content:space-between;
-        gap:24px;
+        gap:18px;
         flex-wrap:wrap;
+        font-size:.88rem;
     }
-    .bv-footer img { width: 150px; }
-    .bv-footer a { color:#aeb9d8; margin-left:18px; text-decoration:none; font-weight:700; }
     @media (max-width: 980px) {
         .bv-links { display:none; }
         .bv-hero { grid-template-columns: 1fr; min-height: auto; padding-top: 40px; }
@@ -396,8 +494,7 @@ def show_landing_page():
         .bv-hero-actions .bv-btn { width:100%; }
         .bv-preview-grid, .bv-stats, .bv-feature-grid, .bv-timeline, .bv-quotes, .bv-main-preview { grid-template-columns: 1fr; }
         .bv-main-preview .bv-preview-card:nth-child(4), .bv-main-preview .bv-preview-card:nth-child(5) { grid-column:auto; }
-        .bv-footer { flex-direction:column; }
-        .bv-footer a { margin: 0 14px 0 0; }
+        .bv-footer-grid { grid-template-columns: 1fr; }
     }
     </style>
     """, unsafe_allow_html=True)
@@ -410,7 +507,7 @@ def show_landing_page():
           <a href="#features">Features</a>
           <a href="#how">How it Works</a>
           <a href="#preview">Preview</a>
-          <a href="#docs">Docs</a>
+          <a href="#security">Security</a>
         </div>
         <div class="bv-nav-actions">
           <a class="bv-btn" href="#access">Sign In</a>
@@ -436,8 +533,18 @@ def show_landing_page():
           <div class="bv-preview-grid">
             <div class="bv-preview-card"><div class="bv-label">Data Quality</div><div class="bv-value">94/100</div><div class="bv-chip">Ready for reporting</div></div>
             <div class="bv-preview-card"><div class="bv-label">Forecast Trend</div><div class="bv-value">+18.7%</div><div class="bv-chip">Next period growth</div></div>
-            <div class="bv-preview-card wide"><div class="bv-label">Revenue Momentum</div><div class="bv-chart"><span class="bv-bar" style="height:42%"></span><span class="bv-bar" style="height:58%"></span><span class="bv-bar" style="height:46%"></span><span class="bv-bar" style="height:72%"></span><span class="bv-bar" style="height:64%"></span><span class="bv-bar" style="height:88%"></span><span class="bv-bar" style="height:78%"></span></div></div>
-            <div class="bv-preview-card wide"><div class="bv-label">AI Insight Path</div><div class="bv-line"></div></div>
+            <div class="bv-preview-card wide"><div class="bv-label">Revenue Momentum</div><div class="bv-chart"><span class="bv-bar" style="--h:42%;--d:40ms"></span><span class="bv-bar" style="--h:58%;--d:90ms"></span><span class="bv-bar" style="--h:46%;--d:140ms"></span><span class="bv-bar" style="--h:72%;--d:190ms"></span><span class="bv-bar" style="--h:64%;--d:240ms"></span><span class="bv-bar" style="--h:88%;--d:290ms"></span><span class="bv-bar" style="--h:78%;--d:340ms"></span></div></div>
+            <div class="bv-preview-card wide">
+              <div class="bv-label">AI Insight Path</div>
+              <div class="bv-line-chart">
+                <svg viewBox="0 0 520 138" preserveAspectRatio="none" aria-hidden="true">
+                  <defs><linearGradient id="heroLine" x1="0" y1="0" x2="520" y2="0"><stop stop-color="#7c3cff"/><stop offset=".52" stop-color="#00d4ff"/><stop offset="1" stop-color="#50f0c8"/></linearGradient></defs>
+                  <path class="area" d="M18 100 C76 84 92 118 144 82 S230 44 284 58 S374 104 502 24 L502 138 L18 138 Z" fill="url(#heroLine)"/>
+                  <path class="main-line" d="M18 100 C76 84 92 118 144 82 S230 44 284 58 S374 104 502 24" fill="none" stroke="url(#heroLine)" stroke-width="5" stroke-linecap="round"/>
+                  <g fill="#081126" stroke="#67e8f9" stroke-width="4"><circle cx="144" cy="82" r="6"/><circle cx="284" cy="58" r="6"/><circle cx="502" cy="24" r="6"/></g>
+                </svg>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -481,17 +588,25 @@ def show_landing_page():
               <div class="bv-preview-card"><div class="bv-label">Rows</div><div class="bv-value">18.4K</div><div class="bv-chip">Parsed</div></div>
               <div class="bv-preview-card"><div class="bv-label">Charts</div><div class="bv-value">12</div><div class="bv-chip">Auto-generated</div></div>
               <div class="bv-preview-card"><div class="bv-label">Reports</div><div class="bv-value">PDF</div><div class="bv-chip">Ready</div></div>
-              <div class="bv-preview-card wide"><div class="bv-label">Performance Chart</div><div class="bv-line"></div></div>
+              <div class="bv-preview-card wide">
+                <div class="bv-label">Performance Chart</div>
+                <div class="bv-line-chart">
+                  <svg viewBox="0 0 520 138" preserveAspectRatio="none" aria-hidden="true">
+                    <defs><linearGradient id="previewLine" x1="0" y1="0" x2="520" y2="0"><stop stop-color="#00d4ff"/><stop offset=".45" stop-color="#2f6bff"/><stop offset="1" stop-color="#9b6cff"/></linearGradient></defs>
+                    <path class="area" d="M16 108 C66 90 104 94 138 68 S218 30 268 56 S346 90 398 50 S462 38 504 32 L504 138 L16 138 Z" fill="url(#previewLine)"/>
+                    <path class="main-line" d="M16 108 C66 90 104 94 138 68 S218 30 268 56 S346 90 398 50 S462 38 504 32" fill="none" stroke="url(#previewLine)" stroke-width="5" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
               <div class="bv-preview-card"><div class="bv-label">AI Summary</div><p style="color:#dbeafe;line-height:1.55;margin-top:12px">Sales momentum increased in West region while returns need review in Electronics.</p></div>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="bv-section" id="docs">
-        <div class="bv-section-title"><h2>Built on a credible stack</h2><p>Lightweight, explainable, and ready for college demos or production extension.</p></div>
-        <div class="bv-stack-row">
-          <span class="bv-badge">Streamlit</span><span class="bv-badge">OpenAI</span><span class="bv-badge">Gemini</span><span class="bv-badge">Groq</span><span class="bv-badge">Python</span><span class="bv-badge">Plotly</span>
+      <section class="bv-section" id="security">
+        <div class="bv-security-row">
+          <span class="bv-badge">Private workspace</span><span class="bv-badge">Masked AI context</span><span class="bv-badge">Role-based access</span><span class="bv-badge">Admin review flow</span>
         </div>
       </section>
 
@@ -508,6 +623,7 @@ def show_landing_page():
         <h2>Start Analyzing Your Data Today</h2>
         <p>Upload a file, ask questions, detect patterns, forecast trends, and export your report.</p>
         <a class="bv-btn primary" href="#access">Get Started Free</a>
+        <div class="bv-final-trust"><span>No credit card required</span><span>Free forever plan</span><span>Setup in 2 minutes</span></div>
       </section>
     </div>
     """, unsafe_allow_html=True)
@@ -515,10 +631,41 @@ def show_landing_page():
     show_auth_step(embedded=True)
 
     st.markdown(f"""
-    <footer class="bv-footer">
-      <div><img src="{logo_data_uri}" alt="{BRAND_NAME} logo"><div>{BRAND_TAGLINE}</div></div>
-      <div><a href="#features">Features</a><a href="#how">Workflow</a><a href="#preview">Preview</a><a href="#access">Sign In</a></div>
-      <div>Copyright 2026 BizVision AI. All rights reserved.</div>
+    <footer class="bv-footer" id="resources">
+      <div class="bv-footer-grid">
+        <div>
+          <img src="{logo_data_uri}" alt="{BRAND_NAME} logo">
+          <div>{BRAND_TAGLINE}</div>
+          <p>BizVision AI helps teams turn CSV and Excel files into clear dashboards, AI insights, forecasts, anomaly checks, and PDF reports.</p>
+          <div class="bv-socials">
+            <a href="#" aria-label="GitHub">GH</a>
+            <a href="#" aria-label="LinkedIn">in</a>
+            <a href="#" aria-label="Twitter">X</a>
+          </div>
+        </div>
+        <div>
+          <h4>Product</h4>
+          <a href="#features">Features</a>
+          <a href="#how">How it Works</a>
+          <a href="#access">Pricing</a>
+          <a href="#access">Sign In</a>
+        </div>
+        <div>
+          <h4>Resources</h4>
+          <a href="#resources">Documentation</a>
+          <a href="#preview">Demo</a>
+          <a href="#features">FAQ</a>
+        </div>
+        <div>
+          <h4>Legal</h4>
+          <a href="#resources">Privacy Policy</a>
+          <a href="#resources">Terms of Service</a>
+        </div>
+      </div>
+      <div class="bv-footer-bottom">
+        <span>Copyright 2026 BizVision AI. All rights reserved.</span>
+        <span>Secure analytics workspace · Made with care using Streamlit</span>
+      </div>
     </footer>
     """, unsafe_allow_html=True)
 
