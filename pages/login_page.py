@@ -179,8 +179,8 @@ def show_landing_page():
         box-shadow: 0 16px 38px rgba(47, 107, 255, 0.28);
     }
     .bv-section {
-        padding: clamp(56px, 7vw, 96px) clamp(20px, 5vw, 72px);
-        max-width: 1280px;
+        padding: 80px clamp(20px, 5vw, 72px);
+        max-width: 1200px;
         margin: 0 auto;
     }
     .bv-hero {
@@ -192,9 +192,9 @@ def show_landing_page():
         position: relative;
     }
     .bv-auth-hero {
-        max-width: 1280px;
+        max-width: 1200px;
         margin: 0 auto;
-        padding: clamp(48px, 7vw, 92px) clamp(20px, 5vw, 72px) 42px;
+        padding: 80px clamp(20px, 5vw, 72px);
         position: relative;
     }
     .bv-pitch {
@@ -363,12 +363,12 @@ def show_landing_page():
     @keyframes bvGlow { 0%,100% { filter: drop-shadow(0 0 0 rgba(0,212,255,0)); } 50% { filter: drop-shadow(0 0 10px rgba(0,212,255,.28)); } }
     @keyframes bvDraw { to { stroke-dashoffset: 0; } }
     .bv-stats {
-        max-width: 1280px;
-        margin: -32px auto 0;
-        padding: 0 clamp(20px, 5vw, 72px) 34px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 80px clamp(20px, 5vw, 72px);
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 14px;
+        gap: 24px;
     }
     .bv-stat {
         border: 1px solid rgba(148, 163, 184, .15);
@@ -380,10 +380,10 @@ def show_landing_page():
     }
     .bv-stat strong { display:block; color:#fff; font-size: clamp(1.35rem, 2.8vw, 2.25rem); font-weight: 900; }
     .bv-stat span { color:#95a3c7; font-weight: 700; font-size: .9rem; }
-    .bv-section-title { text-align: center; max-width: 760px; margin: 0 auto 34px; }
+    .bv-section-title { text-align: center; max-width: 760px; margin: 0 auto 48px; }
     .bv-section-title h2 { margin:0; font-size: clamp(2rem, 4vw, 3.4rem); line-height: 1.05; color:#fff; letter-spacing: -0.035em; }
     .bv-section-title p { color:#aeb9d8; font-size: 1.05rem; line-height:1.65; margin: 16px 0 0; }
-    .bv-feature-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .bv-feature-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
     .bv-feature, .bv-quote {
         border: 1px solid rgba(148, 163, 184, .15);
         border-radius: 22px;
@@ -394,7 +394,7 @@ def show_landing_page():
     }
     .bv-feature:hover, .bv-quote:hover {
         transform: translateY(-6px);
-        border-color: rgba(0, 212, 255, .36);
+        border-color: rgba(148, 163, 184, .15);
         box-shadow: 0 22px 56px rgba(0,0,0,.24);
     }
     .bv-icon {
@@ -410,7 +410,7 @@ def show_landing_page():
     }
     .bv-feature h3 { margin:0 0 10px; color:#fff; font-size:1.15rem; }
     .bv-feature p, .bv-step p, .bv-quote p { color:#aeb9d8; line-height:1.55; margin:0; }
-    .bv-timeline { display:grid; grid-template-columns: repeat(4, 1fr); gap: 16px; position:relative; }
+    .bv-timeline { display:grid; grid-template-columns: repeat(4, 1fr); gap: 24px; position:relative; }
     .bv-step {
         border: 1px solid rgba(148, 163, 184, .15);
         border-radius: 22px;
@@ -424,15 +424,17 @@ def show_landing_page():
         border-radius: 28px;
         background: linear-gradient(145deg, rgba(21, 29, 58, .92), rgba(8, 13, 31, .94));
         box-shadow: 0 30px 80px rgba(0,0,0,.34);
-        padding: 18px;
+        padding: 20px;
+        overflow: hidden;
     }
-    .bv-product-layout { display:grid; grid-template-columns: 220px 1fr; gap: 16px; }
+    .bv-product-layout { display:grid; grid-template-columns: 220px 1fr; gap: 24px; }
     .bv-side { border-radius: 20px; background: rgba(255,255,255,.05); padding: 16px; }
     .bv-side div { height: 12px; border-radius: 99px; background: rgba(174,185,216,.22); margin: 14px 0; }
-    .bv-main-preview { display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    .bv-main-preview .bv-preview-card:nth-child(4) { grid-column: 1 / 3; }
-    .bv-main-preview .bv-preview-card:nth-child(5) { grid-column: 3; }
-    .bv-security-row { display:flex; flex-wrap:wrap; gap: 12px; justify-content:center; }
+    .bv-main-preview { display:grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: stretch; }
+    .bv-main-preview .performance-card { grid-column: 1 / 3; min-height: 260px; }
+    .bv-main-preview .summary-card { grid-column: 3; min-height: 260px; }
+    .bv-main-preview .performance-card .bv-line-chart { height: 188px; }
+    .bv-security-row { display:flex; flex-wrap:wrap; gap: 12px; justify-content:center; margin-bottom: 24px; }
     .bv-badge {
         border:1px solid rgba(148,163,184,.16);
         border-radius:999px;
@@ -441,20 +443,20 @@ def show_landing_page():
         background: rgba(255,255,255,.055);
         font-weight:800;
     }
-    .bv-quotes { display:grid; grid-template-columns: repeat(3, 1fr); gap:16px; }
+    .bv-quotes { display:grid; grid-template-columns: repeat(3, 1fr); gap:24px; }
     .bv-quote strong { display:block; color:#fff; margin-top: 16px; }
     .bv-final {
         max-width: none;
         position: relative;
         overflow: hidden;
-        margin: 36px clamp(18px, 4vw, 58px) 0;
+        margin: 0 clamp(18px, 4vw, 58px);
         border-radius: 36px;
         border: 1px solid rgba(255,255,255,.18);
         background:
             radial-gradient(circle at 50% 48%, rgba(255,255,255,.22), transparent 28%),
             linear-gradient(115deg, rgba(124,60,255,.94), rgba(47,107,255,.94), rgba(0,212,255,.82));
         text-align:center;
-        padding: 88px 24px;
+        padding: 80px 24px;
         box-shadow: 0 30px 90px rgba(47, 107, 255, .28);
     }
     .bv-final::before {
@@ -504,8 +506,8 @@ def show_landing_page():
     }
     @keyframes bvShimmer { 0% { transform: translateX(-45%) rotate(12deg); } 100% { transform: translateX(45%) rotate(12deg); } }
     .bv-footer {
-        margin-top: 58px;
-        padding: 58px clamp(20px, 5vw, 72px) 28px;
+        margin-top: 0;
+        padding: 80px clamp(20px, 5vw, 72px);
         border-top: 1px solid rgba(0,212,255,.2);
         background:
             radial-gradient(circle at 50% 0%, rgba(0,212,255,.08), transparent 34%),
@@ -517,7 +519,7 @@ def show_landing_page():
         display: grid;
         grid-template-columns: 1.45fr .75fr .75fr .75fr;
         gap: 34px;
-        max-width: 1280px;
+        max-width: 1200px;
         margin: 0 auto;
     }
     .bv-footer img { width: 164px; margin-bottom: 14px; }
@@ -538,7 +540,7 @@ def show_landing_page():
         margin:0;
     }
     .bv-footer-bottom {
-        max-width: 1280px;
+        max-width: 1200px;
         margin: 34px auto 0;
         padding-top: 20px;
         border-top: 1px solid rgba(148,163,184,.13);
@@ -559,9 +561,12 @@ def show_landing_page():
         .bv-nav { align-items:flex-start; flex-direction:column; }
         .bv-nav-actions { width:100%; }
         .bv-nav-actions .bv-btn { flex:1; }
+        .bv-section, .bv-auth-hero, .bv-stats, .bv-footer { padding-top: 64px; padding-bottom: 64px; }
+        .bv-section-title { margin-bottom: 32px; }
         .bv-hero-actions .bv-btn { width:100%; }
-        .bv-preview-grid, .bv-stats, .bv-feature-grid, .bv-timeline, .bv-quotes, .bv-main-preview { grid-template-columns: 1fr; }
-        .bv-main-preview .bv-preview-card:nth-child(4), .bv-main-preview .bv-preview-card:nth-child(5) { grid-column:auto; }
+        .bv-preview-grid, .bv-stats, .bv-feature-grid, .bv-timeline, .bv-quotes, .bv-main-preview { grid-template-columns: 1fr; gap: 16px; }
+        .bv-main-preview .performance-card, .bv-main-preview .summary-card { grid-column:auto; min-height: auto; }
+        .bv-main-preview .performance-card .bv-line-chart { height: 150px; }
         .bv-footer-grid { grid-template-columns: 1fr; }
     }
     </style>
@@ -649,29 +654,30 @@ def show_landing_page():
               <div class="bv-preview-card"><div class="bv-label">Rows</div><div class="bv-value">18.4K</div><div class="bv-chip">Parsed</div></div>
               <div class="bv-preview-card"><div class="bv-label">Charts</div><div class="bv-value">12</div><div class="bv-chip">Auto-generated</div></div>
               <div class="bv-preview-card"><div class="bv-label">Reports</div><div class="bv-value">PDF</div><div class="bv-chip">Ready</div></div>
-              <div class="bv-preview-card wide">
+              <div class="bv-preview-card performance-card">
                 <div class="bv-label">Performance Chart</div>
                 <div class="bv-line-chart">
                   <svg viewBox="0 0 520 138" preserveAspectRatio="none" aria-hidden="true">
-                    <defs><linearGradient id="previewLine" x1="0" y1="0" x2="520" y2="0"><stop stop-color="#00d4ff"/><stop offset=".45" stop-color="#2f6bff"/><stop offset="1" stop-color="#9b6cff"/></linearGradient></defs>
+                    <defs>
+                      <linearGradient id="previewLine" x1="0" y1="0" x2="520" y2="0"><stop stop-color="#00d4ff"/><stop offset=".45" stop-color="#2f6bff"/><stop offset="1" stop-color="#9b6cff"/></linearGradient>
+                      <linearGradient id="previewLineTwo" x1="0" y1="0" x2="520" y2="0"><stop stop-color="#9b6cff"/><stop offset=".5" stop-color="#7c3cff"/><stop offset="1" stop-color="#50f0c8"/></linearGradient>
+                    </defs>
                     <path class="area" d="M16 108 C66 90 104 94 138 68 S218 30 268 56 S346 90 398 50 S462 38 504 32 L504 138 L16 138 Z" fill="url(#previewLine)"/>
                     <path class="main-line" d="M16 108 C66 90 104 94 138 68 S218 30 268 56 S346 90 398 50 S462 38 504 32" fill="none" stroke="url(#previewLine)" stroke-width="5" stroke-linecap="round"/>
+                    <path class="main-line" d="M16 84 C74 76 98 42 154 58 S246 104 306 78 S398 26 504 64" fill="none" stroke="url(#previewLineTwo)" stroke-width="4" stroke-linecap="round" opacity=".95"/>
                   </svg>
                 </div>
               </div>
-              <div class="bv-preview-card"><div class="bv-label">AI Summary</div><p style="color:#dbeafe;line-height:1.55;margin-top:12px">Sales momentum increased in West region while returns need review in Electronics.</p></div>
+              <div class="bv-preview-card summary-card"><div class="bv-label">AI Summary</div><p style="color:#dbeafe;line-height:1.55;margin-top:12px">Sales momentum increased in West region while returns need review in Electronics.</p></div>
             </div>
           </div>
         </div>
       </section>
 
-      <section class="bv-section" id="security">
-        <div class="bv-security-row">
+      <section class="bv-section">
+        <div class="bv-security-row" id="security">
           <span class="bv-badge">Private workspace</span><span class="bv-badge">Masked AI context</span><span class="bv-badge">Role-based access</span><span class="bv-badge">Admin review flow</span>
         </div>
-      </section>
-
-      <section class="bv-section">
         <div class="bv-section-title"><h2>Social proof</h2><p>Placeholder quotes for you to edit before final submission.</p></div>
         <div class="bv-quotes">
           <div class="bv-quote"><p>"BizVision AI helped me explain raw sales data like a complete business intelligence workflow."</p><strong>Placeholder Student</strong></div>
