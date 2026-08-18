@@ -766,16 +766,17 @@ def show_auth_step(embedded: bool = False):
     }
     .auth-shell a { color: #67e8f9; text-decoration: none; font-weight: 800; }
     
-    div[data-testid="stVerticalBlock"] > div:has(.custom-login-box) {
+    div[data-testid="column"]:has(.custom-login-box) {
         background:
             radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.16), transparent 34%),
             linear-gradient(160deg, #0f0f2a 0%, #14142e 100%) !important;
         border: 1px solid rgba(0, 212, 255, 0.22) !important;
         border-radius: 18px !important;
         padding: 34px 30px !important;
-        max-width: 430px !important;
+        max-width: 470px !important;
         margin: 0 auto !important;
         box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42), 0 0 42px rgba(0, 102, 255, 0.12) !important;
+        animation: bvEnter .82s ease both;
     }
     .custom-login-box { display: none !important; }
     .login-logo { font-size: 2.8rem; text-align: center; margin-bottom: 5px; }
