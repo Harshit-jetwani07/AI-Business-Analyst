@@ -191,6 +191,74 @@ def show_landing_page():
         align-items: center;
         position: relative;
     }
+    .bv-auth-hero {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: clamp(48px, 7vw, 92px) clamp(20px, 5vw, 72px) 42px;
+        position: relative;
+    }
+    .bv-pitch {
+        min-height: 560px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        animation: bvEnter .72s ease both;
+    }
+    .bv-mini-brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 22px;
+    }
+    .bv-mini-brand img {
+        width: 170px;
+        height: auto;
+        display: block;
+    }
+    .bv-mini-brand span {
+        color: #67e8f9;
+        font-weight: 850;
+        font-size: .9rem;
+    }
+    .bv-pitch h1 {
+        margin: 0;
+        color: #ffffff;
+        font-size: clamp(3rem, 5.1vw, 5rem);
+        line-height: .98;
+        letter-spacing: -0.04em;
+        font-weight: 900;
+        max-width: 760px;
+    }
+    .bv-pitch p {
+        color: #aeb9d8;
+        font-size: clamp(1.05rem, 1.7vw, 1.22rem);
+        line-height: 1.7;
+        max-width: 660px;
+        margin: 24px 0 0;
+    }
+    .bv-floating-shape {
+        position: absolute;
+        width: 74px;
+        height: 74px;
+        border-radius: 22px;
+        border: 1px solid rgba(0,212,255,.22);
+        background: linear-gradient(135deg, rgba(124,60,255,.18), rgba(0,212,255,.10));
+        box-shadow: 0 18px 48px rgba(47,107,255,.16);
+        transform: rotate(12deg);
+        right: 8%;
+        top: 18%;
+        opacity: .72;
+    }
+    .bv-floating-shape.two {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        right: 20%;
+        top: 72%;
+        transform: rotate(-18deg);
+    }
+    @keyframes bvEnter { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
     .bv-eyebrow {
         display: inline-flex;
         align-items: center;
@@ -510,45 +578,38 @@ def show_landing_page():
           <a href="#security">Security</a>
         </div>
         <div class="bv-nav-actions">
-          <a class="bv-btn" href="#access">Sign In</a>
-          <a class="bv-btn primary" href="#access">Get Started</a>
+          <a class="bv-btn" href="#top-auth">Sign In</a>
+          <a class="bv-btn primary" href="#top-auth">Get Started</a>
         </div>
       </nav>
+    </div>
+    """, unsafe_allow_html=True)
 
-      <section class="bv-section bv-hero">
-        <div>
-          <div class="bv-eyebrow">AI analytics workspace for business data</div>
+    st.markdown('<div id="top-auth" class="bv-auth-hero">', unsafe_allow_html=True)
+    pitch_col, auth_col = st.columns([1.15, 0.85], gap="large")
+    with pitch_col:
+        st.markdown(f"""
+        <div class="bv-pitch">
+          <div class="bv-floating-shape"></div>
+          <div class="bv-floating-shape two"></div>
+          <div class="bv-mini-brand"><img src="{logo_data_uri}" alt="{BRAND_NAME} logo"><span>{BRAND_TAGLINE}</span></div>
           <h1>Turn Your Business Data Into <span class="bv-gradient-text">Instant AI Insights</span></h1>
-          <p class="bv-subhead">{BRAND_NAME} converts CSV and Excel files into dashboards, quality scores, forecasts, anomaly alerts, AI answers, and export-ready PDF reports.</p>
+          <p>A premium AI analytics workspace for business teams. Upload your data, chat with AI, detect anomalies, forecast trends, and export polished reports from one connected dashboard.</p>
           <div class="bv-hero-actions">
-            <a class="bv-btn primary" href="#access">Get Started Free</a>
-            <a class="bv-btn" href="#access">Sign In</a>
+            <a class="bv-btn primary" href="#features">Explore Features</a>
+            <a class="bv-btn" href="#preview">See Live Demo</a>
           </div>
           <div class="bv-mini-proof">
             <span>Smart parser</span><span>AI chat</span><span>Forecasting</span><span>Admin approvals</span>
           </div>
         </div>
-        <div class="bv-dashboard" aria-label="BizVision AI dashboard preview">
-          <div class="bv-browser-bar"><span class="bv-dot"></span><span class="bv-dot"></span><span class="bv-dot"></span></div>
-          <div class="bv-preview-grid">
-            <div class="bv-preview-card"><div class="bv-label">Data Quality</div><div class="bv-value">94/100</div><div class="bv-chip">Ready for reporting</div></div>
-            <div class="bv-preview-card"><div class="bv-label">Forecast Trend</div><div class="bv-value">+18.7%</div><div class="bv-chip">Next period growth</div></div>
-            <div class="bv-preview-card wide"><div class="bv-label">Revenue Momentum</div><div class="bv-chart"><span class="bv-bar" style="--h:42%;--d:40ms"></span><span class="bv-bar" style="--h:58%;--d:90ms"></span><span class="bv-bar" style="--h:46%;--d:140ms"></span><span class="bv-bar" style="--h:72%;--d:190ms"></span><span class="bv-bar" style="--h:64%;--d:240ms"></span><span class="bv-bar" style="--h:88%;--d:290ms"></span><span class="bv-bar" style="--h:78%;--d:340ms"></span></div></div>
-            <div class="bv-preview-card wide">
-              <div class="bv-label">AI Insight Path</div>
-              <div class="bv-line-chart">
-                <svg viewBox="0 0 520 138" preserveAspectRatio="none" aria-hidden="true">
-                  <defs><linearGradient id="heroLine" x1="0" y1="0" x2="520" y2="0"><stop stop-color="#7c3cff"/><stop offset=".52" stop-color="#00d4ff"/><stop offset="1" stop-color="#50f0c8"/></linearGradient></defs>
-                  <path class="area" d="M18 100 C76 84 92 118 144 82 S230 44 284 58 S374 104 502 24 L502 138 L18 138 Z" fill="url(#heroLine)"/>
-                  <path class="main-line" d="M18 100 C76 84 92 118 144 82 S230 44 284 58 S374 104 502 24" fill="none" stroke="url(#heroLine)" stroke-width="5" stroke-linecap="round"/>
-                  <g fill="#081126" stroke="#67e8f9" stroke-width="4"><circle cx="144" cy="82" r="6"/><circle cx="284" cy="58" r="6"/><circle cx="502" cy="24" r="6"/></g>
-                </svg>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+        """, unsafe_allow_html=True)
+    with auth_col:
+        show_auth_step(embedded=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
+    st.markdown(f"""
+    <div class="bv-page">
       <div class="bv-stats">
         <div class="bv-stat"><strong>10,000+</strong><span>Rows analyzed per session</span></div>
         <div class="bv-stat"><strong>99.9%</strong><span>Demo-ready uptime target</span></div>
@@ -622,13 +683,11 @@ def show_landing_page():
       <section class="bv-final">
         <h2>Start Analyzing Your Data Today</h2>
         <p>Upload a file, ask questions, detect patterns, forecast trends, and export your report.</p>
-        <a class="bv-btn primary" href="#access">Get Started Free</a>
+        <a class="bv-btn primary" href="#top-auth">Get Started Free</a>
         <div class="bv-final-trust"><span>No credit card required</span><span>Free forever plan</span><span>Setup in 2 minutes</span></div>
       </section>
     </div>
     """, unsafe_allow_html=True)
-
-    show_auth_step(embedded=True)
 
     st.markdown(f"""
     <footer class="bv-footer" id="resources">
@@ -647,8 +706,8 @@ def show_landing_page():
           <h4>Product</h4>
           <a href="#features">Features</a>
           <a href="#how">How it Works</a>
-          <a href="#access">Pricing</a>
-          <a href="#access">Sign In</a>
+          <a href="#top-auth">Pricing</a>
+          <a href="#top-auth">Sign In</a>
         </div>
         <div>
           <h4>Resources</h4>
@@ -695,7 +754,7 @@ def show_auth_step(embedded: bool = False):
         background-size: 42px 42px, 42px 42px, auto, auto !important;
     }
     [data-testid="stSidebar"] { display: none !important; }
-    .block-container { padding-top: 2.4rem !important; max-width: 100% !important; }
+    .block-container { max-width: 100% !important; }
     .auth-shell {
         width: min(100%, 1040px);
         margin: 0 auto 22px;
@@ -796,78 +855,25 @@ def show_auth_step(embedded: bool = False):
         color: #bfa6ff !important;
         text-decoration: underline !important;
     }
-    .access-copy {
-        padding: 28px;
-        border: 1px solid rgba(148, 163, 184, .16);
-        border-radius: 24px;
-        background:
-            radial-gradient(circle at 12% 0%, rgba(0, 212, 255, .14), transparent 36%),
-            linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.035));
-        box-shadow: 0 22px 58px rgba(0,0,0,.22);
+    .auth-mode-caption {
+        color: #8d88c7;
+        text-align: center;
+        font-size: .78rem;
+        font-weight: 800;
+        margin: 0 0 8px;
+        text-transform: uppercase;
     }
-    .access-copy h2 {
-        color: #ffffff;
-        font-size: clamp(2rem, 4vw, 3.25rem);
-        line-height: 1.04;
-        letter-spacing: -0.035em;
-        margin: 0 0 14px;
+    div[data-testid="stHorizontalBlock"]:has(button[kind]) {
+        gap: .55rem;
     }
-    .access-copy p {
-        color: #aeb9d8;
-        line-height: 1.68;
-        font-size: 1.02rem;
-        margin: 0 0 20px;
-    }
-    .access-bullets {
-        display: grid;
-        gap: 12px;
-        margin-top: 22px;
-    }
-    .access-bullet {
-        border: 1px solid rgba(148, 163, 184, .14);
-        border-radius: 16px;
-        background: rgba(255,255,255,.045);
-        color: #dbeafe;
-        padding: 14px 16px;
-        font-weight: 750;
-    }
-    .access-bullet span { color: #67e8f9; margin-right: 8px; }
     </style>
     """, unsafe_allow_html=True)
 
     if embedded:
-        st.markdown('<div id="access" style="height:1px;"></div>', unsafe_allow_html=True)
-        st.markdown(
-            """
-            <section class="bv-section" style="padding-top:72px;">
-              <div class="bv-section-title">
-                <h2>Access Your Analytics Workspace</h2>
-                <p>Sign in or create an account without leaving the landing page.</p>
-              </div>
-            </section>
-            """,
-            unsafe_allow_html=True,
-        )
-        access_copy, access_form = st.columns([1.05, 0.95], gap="large")
-        with access_copy:
-            st.markdown(
-                """
-                <div class="access-copy">
-                  <h2>From raw files to decisions in minutes.</h2>
-                  <p>Use one secure workspace for uploads, AI questions, charts, forecasts, anomaly checks, reports, and admin review.</p>
-                  <div class="access-bullets">
-                    <div class="access-bullet"><span>01</span> Smart CSV/Excel parsing</div>
-                    <div class="access-bullet"><span>02</span> AI insights and auto charts</div>
-                    <div class="access-bullet"><span>03</span> Forecasts, anomaly detection, PDF reports</div>
-                  </div>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-        form_parent = access_form
+        form_parent = st
     else:
         st.markdown(
-            '<div class="auth-shell"><a href="#access">Back to landing</a><span>Secure BizVision AI workspace access</span></div>',
+            '<div class="auth-shell"><a href="#top-auth">Back to landing</a><span>Secure BizVision AI workspace access</span></div>',
             unsafe_allow_html=True,
         )
         form_parent = st
@@ -880,6 +886,27 @@ def show_auth_step(embedded: bool = False):
 
     with form_parent:
         st.markdown('<div class="custom-login-box"></div>', unsafe_allow_html=True)
+        if embedded and st.session_state.get("reset_mode") in {"login", "register"}:
+            st.markdown('<div class="auth-mode-caption">Workspace access</div>', unsafe_allow_html=True)
+            tab_login, tab_register = st.columns(2)
+            with tab_login:
+                if st.button(
+                    "Login",
+                    key="auth_tab_login",
+                    use_container_width=True,
+                    type="primary" if st.session_state["reset_mode"] == "login" else "secondary",
+                ):
+                    st.session_state["reset_mode"] = "login"
+                    st.rerun()
+            with tab_register:
+                if st.button(
+                    "Register",
+                    key="auth_tab_register",
+                    use_container_width=True,
+                    type="primary" if st.session_state["reset_mode"] == "register" else "secondary",
+                ):
+                    st.session_state["reset_mode"] = "register"
+                    st.rerun()
         
         current_mode = st.session_state["reset_mode"]
         
@@ -925,7 +952,7 @@ def show_auth_step(embedded: bool = False):
                     st.session_state["reset_mode"] = "forgot"
                     st.rerun()
             with link_col2:
-                if st.button("Create Account", key="lnk_switch_to_register"):
+                if st.button("Don't have an account? Register", key="lnk_switch_to_register"):
                     st.session_state["show_forgot_link"] = False
                     st.session_state["reset_mode"] = "register"
                     st.rerun()
@@ -936,6 +963,7 @@ def show_auth_step(embedded: bool = False):
             st.markdown(brand_header("Create Account", "Start with a standard user workspace"), unsafe_allow_html=True)
 
             with st.form(key="form_execution_register_isolated"):
+                reg_full_name = st.text_input("Full Name", placeholder="e.g. Harshit Jetwani", key="register_full_name_widget")
                 reg_username = st.text_input("Username", placeholder="e.g. harshit_data", key="register_username_widget")
                 reg_email = st.text_input("Email Address", placeholder="name@example.com", key="register_email_widget")
                 reg_password = st.text_input("Password", type="password", placeholder="Choose a password", key="register_password_widget")
@@ -958,7 +986,7 @@ def show_auth_step(embedded: bool = False):
                     email = reg_email.strip()
                     email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 
-                    if not username or not email or not reg_password or not reg_confirm:
+                    if not reg_full_name.strip() or not username or not email or not reg_password or not reg_confirm:
                         st.error("Please fill all registration fields.")
                     elif not re.match(r"^[a-zA-Z0-9_]{3,30}$", username):
                         st.error("Username must be 3-30 characters and can contain only letters, numbers, and underscores.")
@@ -987,6 +1015,7 @@ def show_auth_step(embedded: bool = False):
                                 sent, message = send_otp_email(email, username, generated_otp)
                                 if sent:
                                     st.session_state["pending_registration"] = {
+                                        "full_name": reg_full_name.strip(),
                                         "username": username,
                                         "email": email,
                                         "password": reg_password,
@@ -1002,7 +1031,7 @@ def show_auth_step(embedded: bool = False):
                                     st.caption("Email verification is required. Configure SMTP settings or set ALLOW_UNVERIFIED_REGISTRATION=true only for local demos.")
 
             st.markdown('<div class="link-wrapper">', unsafe_allow_html=True)
-            if st.button("Back to Login", key="lnk_register_back_to_login"):
+            if st.button("Already have an account? Login", key="lnk_register_back_to_login"):
                 st.session_state["show_forgot_link"] = False
                 st.session_state["reset_mode"] = "login"
                 st.rerun()
@@ -1095,6 +1124,16 @@ def show_auth_step(embedded: bool = False):
                         st.error("Invalid verification code.")
 
             st.markdown('<div class="link-wrapper">', unsafe_allow_html=True)
+            if pending.get("email") and st.button("Resend OTP", key="lnk_resend_register_otp"):
+                generated_otp = str(secrets.randbelow(899999) + 100000)
+                sent, message = send_otp_email(pending["email"], pending["username"], generated_otp)
+                if sent:
+                    st.session_state["registration_otp"] = generated_otp
+                    st.session_state["registration_expires_at"] = (datetime.now() + timedelta(minutes=10)).isoformat()
+                    st.session_state["registration_attempts"] = 0
+                    st.success(f"New verification OTP sent to {mask_email(pending['email'])}.")
+                else:
+                    st.error(message)
             if st.button("Cancel Registration", key="lnk_cancel_register_verify"):
                 st.session_state["reset_mode"] = "register"
                 for key in ["pending_registration", "registration_otp", "registration_expires_at", "registration_attempts"]:
