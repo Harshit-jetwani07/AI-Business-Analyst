@@ -1,6 +1,6 @@
-# BizVision AI
+![BizVision AI](assets/logo_full.png)
 
-Business performance ko analyze karne wali intelligent vision.
+## Business performance ko analyze karne wali intelligent vision
 
 BizVision AI is an end-to-end AI-powered business analytics platform built with Streamlit, Python, Pandas, Plotly, SQLite, and OpenAI/Ollama-compatible AI workflows.
 
@@ -167,6 +167,10 @@ BizVision_AI/
 |-- pages/
 |   |-- admin_panel.py
 |   `-- login_page.py
+|-- assets/
+|   |-- logo_full.png
+|   |-- logo_icon.png
+|   `-- favicon.png
 |-- utils/
 |   |-- ai_agent.py
 |   |-- auth.py

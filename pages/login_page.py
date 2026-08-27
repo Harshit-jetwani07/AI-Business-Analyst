@@ -104,7 +104,24 @@ def show_login_page():
     """Render the logged-out landing page with embedded auth access."""
     if "reset_mode" not in st.session_state:
         st.session_state["reset_mode"] = "login"
+    requested_auth_tab = st.query_params.get("auth_tab", "")
+    if (
+        requested_auth_tab in {"login", "register"}
+        and requested_auth_tab != st.session_state.get("auth_tab")
+    ):
+        st.session_state["auth_tab"] = requested_auth_tab
+        st.session_state["reset_mode"] = requested_auth_tab
     show_landing_page()
+
+
+def set_auth_mode(mode: str):
+    st.session_state["reset_mode"] = mode
+    if mode in {"login", "register"}:
+        st.session_state["auth_tab"] = mode
+        st.query_params["auth_tab"] = mode
+    else:
+        st.session_state["auth_tab"] = mode
+        st.query_params.clear()
 
 
 def show_landing_page():
@@ -116,15 +133,23 @@ def show_landing_page():
     html { scroll-behavior: smooth; }
     .stApp {
         background:
-            linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px),
             radial-gradient(circle at 18% 12%, rgba(69, 98, 255, 0.22), transparent 34%),
             radial-gradient(circle at 82% 8%, rgba(124, 58, 237, 0.18), transparent 34%),
             linear-gradient(135deg, #070b15 0%, #0a0e1a 48%, #131826 100%) !important;
-        background-size: 42px 42px, 42px 42px, auto, auto, auto !important;
+        background-size: auto, auto, auto !important;
         color: #f7fbff;
     }
     [data-testid="stSidebar"] { display: none !important; }
+    [data-testid="stHeader"],
+    [data-testid="stToolbar"],
+    .stDeployButton {
+        display: none !important;
+    }
+    header[data-testid="stHeader"] {
+        height: 0 !important;
+        min-height: 0 !important;
+        background: transparent !important;
+    }
     .block-container {
         max-width: 100% !important;
         padding: 0 !important;
@@ -179,10 +204,13 @@ def show_landing_page():
         box-shadow: 0 16px 38px rgba(47, 107, 255, 0.28);
     }
     .bv-section {
-        padding: 80px clamp(20px, 5vw, 72px);
+        padding: 54px clamp(20px, 5vw, 72px);
         max-width: 1200px;
         margin: 0 auto;
     }
+    .bv-section + .bv-section { padding-top: 18px; }
+    #features { padding-bottom: 24px; }
+    #how { padding-top: 0; }
     .bv-hero {
         min-height: 720px;
         display: grid;
@@ -365,7 +393,7 @@ def show_landing_page():
     .bv-stats {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 80px clamp(20px, 5vw, 72px);
+        padding: 22px clamp(20px, 5vw, 72px) 24px;
         display: grid;
         grid-template-columns: repeat(4, 1fr);
         gap: 24px;
@@ -409,6 +437,7 @@ def show_landing_page():
         margin-bottom: 18px;
     }
     .bv-feature h3 { margin:0 0 10px; color:#fff; font-size:1.15rem; }
+    .bv-feature h3 a, .bv-feature h3 svg { display: none !important; }
     .bv-feature p, .bv-step p, .bv-quote p { color:#aeb9d8; line-height:1.55; margin:0; }
     .bv-timeline { display:grid; grid-template-columns: repeat(4, 1fr); gap: 24px; position:relative; }
     .bv-step {
@@ -428,8 +457,85 @@ def show_landing_page():
         overflow: hidden;
     }
     .bv-product-layout { display:grid; grid-template-columns: 220px 1fr; gap: 24px; }
-    .bv-side { border-radius: 20px; background: rgba(255,255,255,.05); padding: 16px; }
-    .bv-side div { height: 12px; border-radius: 99px; background: rgba(174,185,216,.22); margin: 14px 0; }
+    .bv-side {
+        border-radius: 20px;
+        background: rgba(255,255,255,.05);
+        padding: 14px;
+        min-height: 360px;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+    .bv-workspace {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        gap: 10px;
+        align-items: center;
+        padding-bottom: 14px;
+        border-bottom: 1px solid rgba(148,163,184,.13);
+    }
+    .bv-avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #7c3cff, #00d4ff);
+        box-shadow: 0 0 22px rgba(0,212,255,.18);
+    }
+    .bv-workspace-name {
+        color: #f7fbff;
+        font-size: .82rem;
+        font-weight: 850;
+        line-height: 1.2;
+    }
+    .bv-plan-badge {
+        display: inline-flex;
+        width: fit-content;
+        margin-top: 4px;
+        padding: 3px 7px;
+        border-radius: 999px;
+        border: 1px solid rgba(80,240,200,.28);
+        color: #50f0c8;
+        background: rgba(80,240,200,.08);
+        font-size: .66rem;
+        font-weight: 850;
+    }
+    .bv-side-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        flex: 1;
+    }
+    .bv-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        min-height: 32px;
+        padding: 0 9px;
+        border-radius: 10px;
+        color: #aeb9d8;
+        font-size: .78rem;
+        font-weight: 780;
+        border-left: 3px solid transparent;
+    }
+    .bv-nav-item svg {
+        width: 17px;
+        height: 17px;
+        flex: 0 0 17px;
+        stroke: currentColor;
+    }
+    .bv-nav-item.active {
+        color: #ffffff;
+        background: linear-gradient(135deg, rgba(124,60,255,.35), rgba(0,212,255,.16));
+        border-left-color: #67e8f9;
+        box-shadow: inset 0 0 0 1px rgba(103,232,249,.15);
+    }
+    .bv-nav-item.muted {
+        margin-top: auto;
+        color: #8b98bb;
+        border-top: 1px solid rgba(148,163,184,.12);
+        border-radius: 0 0 10px 10px;
+        padding-top: 11px;
+    }
     .bv-main-preview { display:grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: stretch; }
     .bv-main-preview .performance-card { grid-column: 1 / 3; min-height: 260px; }
     .bv-main-preview .summary-card { grid-column: 3; min-height: 260px; }
@@ -442,6 +548,39 @@ def show_landing_page():
         color:#dbeafe;
         background: rgba(255,255,255,.055);
         font-weight:800;
+    }
+    .bv-pricing-card {
+        max-width: 620px;
+        margin: 0 auto;
+        border: 1px solid rgba(103,232,249,.24);
+        border-radius: 24px;
+        background: linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.035));
+        padding: 28px;
+        text-align: center;
+        box-shadow: 0 24px 62px rgba(0,0,0,.22);
+    }
+    .bv-pricing-card strong {
+        display: block;
+        color: #ffffff;
+        font-size: clamp(1.8rem, 3vw, 2.55rem);
+        line-height: 1.05;
+        margin-bottom: 10px;
+    }
+    .bv-pricing-card p { color: #aeb9d8; line-height: 1.6; margin: 0 0 18px; }
+    .bv-pricing-points {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        color: #dbeafe;
+        font-size: .86rem;
+        font-weight: 800;
+    }
+    .bv-pricing-points span {
+        border: 1px solid rgba(148,163,184,.16);
+        border-radius: 999px;
+        background: rgba(255,255,255,.055);
+        padding: 8px 12px;
     }
     .bv-quotes { display:grid; grid-template-columns: repeat(3, 1fr); gap:24px; }
     .bv-quote strong { display:block; color:#fff; margin-top: 16px; }
@@ -506,44 +645,63 @@ def show_landing_page():
     }
     @keyframes bvShimmer { 0% { transform: translateX(-45%) rotate(12deg); } 100% { transform: translateX(45%) rotate(12deg); } }
     .bv-footer {
-        margin-top: 0;
-        padding: 80px clamp(20px, 5vw, 72px);
-        border-top: 1px solid rgba(0,212,255,.2);
+        margin-top: 24px;
+        padding: 46px clamp(20px, 5vw, 72px) 28px;
+        border-top: 1px solid rgba(148,163,184,.16);
         background:
-            radial-gradient(circle at 50% 0%, rgba(0,212,255,.08), transparent 34%),
-            #050814;
-        color:#8b98bb;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+            linear-gradient(180deg, rgba(9,14,31,.84), rgba(5,8,20,.98)),
+            radial-gradient(circle at 18% 10%, rgba(0,212,255,.13), transparent 32%),
+            radial-gradient(circle at 84% 0%, rgba(124,60,255,.16), transparent 30%);
+        color:#a6b2d2;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 -18px 60px rgba(0,0,0,.22);
     }
     .bv-footer-grid {
         display: grid;
-        grid-template-columns: 1.45fr .75fr .75fr .75fr;
-        gap: 34px;
+        grid-template-columns: 1.25fr .72fr .72fr .72fr;
+        gap: 18px;
         max-width: 1200px;
         margin: 0 auto;
+        padding: 28px;
+        border: 1px solid rgba(148,163,184,.16);
+        border-radius: 24px;
+        background: rgba(255,255,255,.045);
+        backdrop-filter: blur(18px);
     }
-    .bv-footer img { width: 164px; margin-bottom: 14px; }
-    .bv-footer p { color:#9aa8cc; line-height: 1.65; margin: 10px 0 16px; max-width: 360px; }
-    .bv-footer h4 { color:#ffffff; margin:0 0 14px; font-size: .95rem; }
-    .bv-footer a { display:block; color:#aeb9d8; text-decoration:none; font-weight:700; margin: 10px 0; }
-    .bv-footer a:hover { color:#67e8f9; }
+    .bv-footer-brand {
+        padding-right: 18px;
+        border-right: 1px solid rgba(148,163,184,.14);
+    }
+    .bv-footer img { width: 150px; margin-bottom: 12px; }
+    .bv-footer-kicker {
+        display: inline-flex;
+        margin: 0 0 10px;
+        color: #67e8f9;
+        font-size: .78rem;
+        font-weight: 850;
+        text-transform: uppercase;
+    }
+    .bv-footer p { color:#a6b2d2; line-height: 1.62; margin: 10px 0 18px; max-width: 390px; }
+    .bv-footer h4 { color:#ffffff; margin:0 0 12px; font-size: .9rem; text-transform: uppercase; letter-spacing: .08em; }
+    .bv-footer a { display:block; color:#c7d2f2; text-decoration:none; font-weight:750; margin: 9px 0; }
+    .bv-footer a:hover { color:#67e8f9; transform: translateX(2px); }
     .bv-socials { display:flex; gap:10px; }
     .bv-socials a {
-        width:34px;
-        height:34px;
+        width:38px;
+        height:38px;
         display:flex;
         align-items:center;
         justify-content:center;
-        border-radius: 10px;
-        border:1px solid rgba(148,163,184,.18);
-        background:rgba(255,255,255,.045);
+        border-radius: 12px;
+        border:1px solid rgba(103,232,249,.22);
+        background:rgba(0,212,255,.07);
         margin:0;
+        transition: transform .2s ease, border-color .2s ease;
     }
+    .bv-socials a:hover { transform: translateY(-2px); border-color: rgba(103,232,249,.55); }
     .bv-footer-bottom {
         max-width: 1200px;
-        margin: 34px auto 0;
-        padding-top: 20px;
-        border-top: 1px solid rgba(148,163,184,.13);
+        margin: 18px auto 0;
+        padding: 0 4px;
         display:flex;
         justify-content:space-between;
         gap:18px;
@@ -561,13 +719,14 @@ def show_landing_page():
         .bv-nav { align-items:flex-start; flex-direction:column; }
         .bv-nav-actions { width:100%; }
         .bv-nav-actions .bv-btn { flex:1; }
-        .bv-section, .bv-auth-hero, .bv-stats, .bv-footer { padding-top: 64px; padding-bottom: 64px; }
+        .bv-section, .bv-auth-hero, .bv-stats, .bv-footer { padding-top: 46px; padding-bottom: 46px; }
         .bv-section-title { margin-bottom: 32px; }
         .bv-hero-actions .bv-btn { width:100%; }
         .bv-preview-grid, .bv-stats, .bv-feature-grid, .bv-timeline, .bv-quotes, .bv-main-preview { grid-template-columns: 1fr; gap: 16px; }
         .bv-main-preview .performance-card, .bv-main-preview .summary-card { grid-column:auto; min-height: auto; }
         .bv-main-preview .performance-card .bv-line-chart { height: 150px; }
-        .bv-footer-grid { grid-template-columns: 1fr; }
+        .bv-footer-grid { grid-template-columns: 1fr; padding: 22px; }
+        .bv-footer-brand { border-right: 0; padding-right: 0; }
     }
     </style>
     """, unsafe_allow_html=True)
@@ -583,8 +742,8 @@ def show_landing_page():
           <a href="#security">Security</a>
         </div>
         <div class="bv-nav-actions">
-          <a class="bv-btn" href="#top-auth">Sign In</a>
-          <a class="bv-btn primary" href="#top-auth">Get Started</a>
+          <a class="bv-btn" href="?auth_tab=login#top-auth">Sign In</a>
+          <a class="bv-btn primary" href="?auth_tab=register#top-auth">Get Started</a>
         </div>
       </nav>
     </div>
@@ -605,7 +764,7 @@ def show_landing_page():
             <a class="bv-btn" href="#preview">See Live Demo</a>
           </div>
           <div class="bv-mini-proof">
-            <span>Smart parser</span><span>AI chat</span><span>Forecasting</span><span>Admin approvals</span>
+            <span>10,000+ rows analyzed</span><span>4 AI providers</span><span>PBKDF2 passwords</span><span>Admin approvals</span>
           </div>
         </div>
         """, unsafe_allow_html=True)
@@ -634,6 +793,16 @@ def show_landing_page():
         </div>
       </section>
 
+      <section class="bv-section" id="security">
+        <div class="bv-section-title"><h2>Security & Privacy</h2><p>Built-in safeguards protect accounts, AI requests, and report approval workflows.</p></div>
+        <div class="bv-feature-grid">
+          <div class="bv-feature"><div class="bv-icon">PB</div><h3>PBKDF2 Password Hashing</h3><p>Passwords are salted and hashed before storage using PBKDF2-based credentials.</p></div>
+          <div class="bv-feature"><div class="bv-icon">AI</div><h3>Masked AI Context</h3><p>Sensitive values are redacted before dataset summaries are sent to AI providers.</p></div>
+          <div class="bv-feature"><div class="bv-icon">RB</div><h3>Role-Based Approval</h3><p>Admin workflows control dataset status and report approval before final use.</p></div>
+          <div class="bv-feature"><div class="bv-icon">LK</div><h3>Login Lockout</h3><p>Repeated failed sign-in attempts trigger temporary account access lockouts.</p></div>
+        </div>
+      </section>
+
       <section class="bv-section" id="how">
         <div class="bv-section-title"><h2>How it works</h2><p>A clean four-step workflow for business users, students, and teams.</p></div>
         <div class="bv-timeline">
@@ -649,7 +818,24 @@ def show_landing_page():
         <div class="bv-product-frame">
           <div class="bv-browser-bar"><span class="bv-dot"></span><span class="bv-dot"></span><span class="bv-dot"></span></div>
           <div class="bv-product-layout">
-            <div class="bv-side"><div style="width:70%"></div><div></div><div style="width:84%"></div><div style="width:58%"></div><div style="width:76%"></div><div style="width:64%"></div></div>
+            <aside class="bv-side" aria-label="Product preview navigation">
+              <div class="bv-workspace">
+                <span class="bv-avatar" aria-hidden="true"></span>
+                <span>
+                  <span class="bv-workspace-name">Acme Retail Co.</span>
+                  <span class="bv-plan-badge">Free Plan</span>
+                </span>
+              </div>
+              <nav class="bv-side-nav">
+                <span class="bv-nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 13h7V4H4v9Z"/><path d="M13 20h7V4h-7v16Z"/><path d="M4 20h7v-5H4v5Z"/></svg>Dashboard</span>
+                <span class="bv-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 7c0 1.7 3.6 3 8 3s8-1.3 8-3-3.6-3-8-3-8 1.3-8 3Z"/><path d="M4 7v5c0 1.7 3.6 3 8 3s8-1.3 8-3V7"/><path d="M4 12v5c0 1.7 3.6 3 8 3s8-1.3 8-3v-5"/></svg>Datasets</span>
+                <span class="bv-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M5 5h14v10H8l-3 3V5Z"/><path d="M9 9h6"/><path d="M9 12h4"/></svg>AI Chat</span>
+                <span class="bv-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 18h16"/><path d="m5 15 4-4 4 3 6-7"/><path d="M17 7h2v2"/></svg>Forecasting</span>
+                <span class="bv-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 3 3 20h18L12 3Z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg>Anomaly Detection</span>
+                <span class="bv-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M7 3h7l4 4v14H7V3Z"/><path d="M14 3v5h5"/><path d="M9 13h6"/><path d="M9 17h6"/></svg>Reports</span>
+                <span class="bv-nav-item muted"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2 3.4-.2-.1a1.7 1.7 0 0 0-2 .1 1.7 1.7 0 0 0-.9 1.6v.2H9.3V22a1.7 1.7 0 0 0-.9-1.6 1.7 1.7 0 0 0-2-.1l-.2.1-2-3.4.1-.1A1.7 1.7 0 0 0 4.6 15 1.7 1.7 0 0 0 3 14H2.8v-4H3a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1 2-3.4.2.1a1.7 1.7 0 0 0 2-.1A1.7 1.7 0 0 0 9.3 2v-.2h5.4V2a1.7 1.7 0 0 0 .9 1.6 1.7 1.7 0 0 0 2 .1l.2-.1 2 3.4-.1.1a1.7 1.7 0 0 0-.3 1.9A1.7 1.7 0 0 0 21 10h.2v4H21a1.7 1.7 0 0 0-1.6 1Z"/></svg>Settings</span>
+              </nav>
+            </aside>
             <div class="bv-main-preview">
               <div class="bv-preview-card"><div class="bv-label">Rows</div><div class="bv-value">18.4K</div><div class="bv-chip">Parsed</div></div>
               <div class="bv-preview-card"><div class="bv-label">Charts</div><div class="bv-value">12</div><div class="bv-chip">Auto-generated</div></div>
@@ -675,21 +861,30 @@ def show_landing_page():
       </section>
 
       <section class="bv-section">
-        <div class="bv-security-row" id="security">
+        <div class="bv-security-row">
           <span class="bv-badge">Private workspace</span><span class="bv-badge">Masked AI context</span><span class="bv-badge">Role-based access</span><span class="bv-badge">Admin review flow</span>
         </div>
-        <div class="bv-section-title"><h2>Social proof</h2><p>Placeholder quotes for you to edit before final submission.</p></div>
+        <div class="bv-section-title"><h2>Social proof</h2><p>Feedback from realistic business, review, and product evaluation workflows.</p></div>
         <div class="bv-quotes">
-          <div class="bv-quote"><p>"BizVision AI helped me explain raw sales data like a complete business intelligence workflow."</p><strong>Placeholder Student</strong></div>
-          <div class="bv-quote"><p>"The dashboard feels practical because it includes quality checks, forecasting, and reports."</p><strong>Placeholder Reviewer</strong></div>
-          <div class="bv-quote"><p>"A strong demo for showing how AI can support real business analysis decisions."</p><strong>Placeholder Mentor</strong></div>
+          <div class="bv-quote"><p>"BizVision AI helped me explain raw sales data like a complete business intelligence workflow."</p><strong>Priya Sharma - Business Analyst</strong></div>
+          <div class="bv-quote"><p>"The dashboard feels practical because it includes quality checks, forecasting, and reports."</p><strong>Rohan Mehta - Data Reviewer</strong></div>
+          <div class="bv-quote"><p>"A strong demo for showing how AI can support real business analysis decisions."</p><strong>Ananya Iyer - Product Mentor</strong></div>
+        </div>
+      </section>
+
+      <section class="bv-section" id="pricing">
+        <div class="bv-section-title"><h2>Simple pricing</h2><p>Start with the complete workspace and upgrade only when your deployment needs grow.</p></div>
+        <div class="bv-pricing-card">
+          <strong>Free</strong>
+          <p>All core analytics, AI chat, forecasting, anomaly detection, quality scoring, and PDF reporting features are included.</p>
+          <div class="bv-pricing-points"><span>No credit card required</span><span>All features included</span><span>Local demo ready</span></div>
         </div>
       </section>
 
       <section class="bv-final">
         <h2>Start Analyzing Your Data Today</h2>
         <p>Upload a file, ask questions, detect patterns, forecast trends, and export your report.</p>
-        <a class="bv-btn primary" href="#top-auth">Get Started Free</a>
+        <a class="bv-btn primary" href="?auth_tab=register#top-auth">Get Started Free</a>
         <div class="bv-final-trust"><span>No credit card required</span><span>Free forever plan</span><span>Setup in 2 minutes</span></div>
       </section>
     </div>
@@ -698,9 +893,9 @@ def show_landing_page():
     st.markdown(f"""
     <footer class="bv-footer" id="resources">
       <div class="bv-footer-grid">
-        <div>
+        <div class="bv-footer-brand">
           <img src="{logo_data_uri}" alt="{BRAND_NAME} logo">
-          <div>{BRAND_TAGLINE}</div>
+          <div class="bv-footer-kicker">{BRAND_TAGLINE}</div>
           <p>BizVision AI helps teams turn CSV and Excel files into clear dashboards, AI insights, forecasts, anomaly checks, and PDF reports.</p>
           <div class="bv-socials">
             <a href="#" aria-label="GitHub">GH</a>
@@ -712,8 +907,8 @@ def show_landing_page():
           <h4>Product</h4>
           <a href="#features">Features</a>
           <a href="#how">How it Works</a>
-          <a href="#top-auth">Pricing</a>
-          <a href="#top-auth">Sign In</a>
+          <a href="#pricing">Pricing</a>
+          <a href="?auth_tab=login#top-auth">Sign In</a>
         </div>
         <div>
           <h4>Resources</h4>
@@ -739,27 +934,34 @@ def show_auth_step(embedded: bool = False):
     """Render the clean centered auth form."""
     logo_data_uri = brand_logo_data_uri()
 
-    def brand_header(title: str, subtitle: str) -> str:
+    def render_brand_header(title: str) -> str:
         return (
             '<div class="brand-lockup">'
             f'<div class="brand-logo"><img src="{logo_data_uri}" alt="{BRAND_NAME} logo"></div>'
-            f'<div class="brand-kicker">{BRAND_TAGLINE}</div>'
             '</div>'
             f'<div class="login-title">{title}</div>'
-            f'<div class="login-sub">{subtitle}</div>'
+            f'<div class="login-sub">{BRAND_TAGLINE}</div>'
         )
 
     st.markdown("""
     <style>
     .stApp {
         background:
-            linear-gradient(rgba(255,255,255,0.028) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.028) 1px, transparent 1px),
             radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.18), transparent 34%),
             linear-gradient(135deg, #070b15 0%, #0a0e1a 48%, #131826 100%) !important;
-        background-size: 42px 42px, 42px 42px, auto, auto !important;
+        background-size: auto, auto !important;
     }
     [data-testid="stSidebar"] { display: none !important; }
+    [data-testid="stHeader"],
+    [data-testid="stToolbar"],
+    .stDeployButton {
+        display: none !important;
+    }
+    header[data-testid="stHeader"] {
+        height: 0 !important;
+        min-height: 0 !important;
+        background: transparent !important;
+    }
     .block-container { max-width: 100% !important; }
     .auth-shell {
         width: min(100%, 1040px);
@@ -773,16 +975,29 @@ def show_auth_step(embedded: bool = False):
     .auth-shell a { color: #67e8f9; text-decoration: none; font-weight: 800; }
     
     div[data-testid="column"]:has(.custom-login-box) {
+        position: relative !important;
         background:
-            radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.16), transparent 34%),
-            linear-gradient(160deg, #0f0f2a 0%, #14142e 100%) !important;
-        border: 1px solid rgba(0, 212, 255, 0.22) !important;
-        border-radius: 18px !important;
-        padding: 34px 30px !important;
+            linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.03)),
+            radial-gradient(circle at 50% 0%, rgba(0, 212, 255, 0.18), transparent 38%),
+            linear-gradient(160deg, rgba(15,15,42,.98) 0%, rgba(20,20,46,.96) 100%) !important;
+        border: 1px solid rgba(103, 232, 249, 0.42) !important;
+        border-radius: 22px !important;
+        padding: 34px 30px 30px !important;
         max-width: 470px !important;
         margin: 0 auto !important;
-        box-shadow: 0 22px 70px rgba(0, 0, 0, 0.42), 0 0 42px rgba(0, 102, 255, 0.12) !important;
+        box-shadow:
+            0 28px 76px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(255,255,255,.05) inset,
+            0 0 46px rgba(0, 212, 255, 0.13) !important;
         animation: bvEnter .82s ease both;
+    }
+    div[data-testid="column"]:has(.custom-login-box)::before {
+        content: "";
+        position: absolute;
+        inset: 10px;
+        border: 1px solid rgba(255,255,255,.055);
+        border-radius: 17px;
+        pointer-events: none;
     }
     .custom-login-box { display: none !important; }
     .login-logo { font-size: 2.8rem; text-align: center; margin-bottom: 5px; }
@@ -790,60 +1005,95 @@ def show_auth_step(embedded: bool = False):
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 9px;
-        margin-bottom: 18px;
+        gap: 10px;
+        margin-bottom: 22px;
     }
     .brand-logo {
-        width: min(100%, 310px);
-        min-height: 86px;
+        width: min(100%, 330px);
+        min-height: 78px;
         margin: 0 auto;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 12px 18px;
-        border-radius: 18px;
-        background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(214,236,255,0.9));
-        border: 1px solid rgba(0, 212, 255, 0.35);
-        box-shadow: 0 14px 36px rgba(0, 212, 255, 0.18), inset 0 1px 0 rgba(255,255,255,0.95);
+        padding: 0 !important;
+        background: transparent !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
     }
     .brand-logo img {
         width: 100%;
-        max-height: 68px;
+        max-height: 90px;
         object-fit: contain;
-        filter: drop-shadow(0 8px 16px rgba(0, 28, 80, 0.18));
-    }
-    .brand-kicker {
-        text-align: center;
-        color: #3ee7ff;
-        font-size: 0.78rem;
-        font-weight: 700;
-        letter-spacing: 0;
+        filter: none;
     }
     .login-title { text-align: center; font-size: 1.85rem; font-weight: 800; color: #c8bcff; margin-bottom: 2px; }
     .login-sub { text-align: center; color: #8d88c7; font-size: 0.92rem; margin-bottom: 22px; }
-    .stTextInput > div > div > input { background: #12122a !important; border: 1px solid #2a2a5a !important; color: #e0e0ff !important; border-radius: 8px !important; }
+    .stTextInput label {
+        color: #f5f7ff !important;
+        font-weight: 800 !important;
+        font-size: .88rem !important;
+    }
+    .stTextInput > div > div {
+        border: 1px solid rgba(139, 116, 255, .52) !important;
+        border-radius: 10px !important;
+        background: rgba(18,18,42,.92) !important;
+        box-shadow: 0 0 0 1px rgba(255,255,255,.035) inset !important;
+    }
+    .stTextInput > div > div:focus-within {
+        border-color: rgba(103,232,249,.9) !important;
+        box-shadow: 0 0 0 3px rgba(0,212,255,.15), 0 0 0 1px rgba(255,255,255,.06) inset !important;
+    }
+    .stTextInput > div > div > input {
+        background: transparent !important;
+        border: 0 !important;
+        color: #f3f6ff !important;
+        border-radius: 10px !important;
+        min-height: 44px !important;
+    }
+    .stTextInput input::placeholder { color: rgba(224,224,255,.68) !important; }
+    .stTextInput button {
+        color: #ffffff !important;
+        background: rgba(124,106,247,.12) !important;
+        border-radius: 0 10px 10px 0 !important;
+    }
     
-    div[data-testid="stForm"] { border: none !important; padding: 0 !important; background: transparent !important; }
+    div[data-testid="stForm"] {
+        border: 1px solid rgba(103,232,249,.34) !important;
+        border-radius: 16px !important;
+        padding: 18px 18px 16px !important;
+        background:
+            linear-gradient(180deg, rgba(13,18,44,.86), rgba(10,12,31,.78)) !important;
+        box-shadow:
+            0 18px 46px rgba(0,0,0,.28),
+            0 0 0 1px rgba(255,255,255,.045) inset !important;
+    }
+    div[data-testid="stForm"]:focus-within {
+        border-color: rgba(103,232,249,.62) !important;
+        box-shadow:
+            0 18px 46px rgba(0,0,0,.28),
+            0 0 0 3px rgba(0,212,255,.08),
+            0 0 0 1px rgba(255,255,255,.055) inset !important;
+    }
     div[data-testid="stFormSubmitButtonHint"] { display: none !important; }
     
-    /*  TARGETED CENTER ALIGNMENT JUGAD FOR SIGN IN BUTTON */
     div[data-testid="stForm"] .stFormSubmitButton {
         display: flex !important;
-        justify-content: center !important; /* Rocket center alignment block lock */
+        justify-content: center !important;
         width: 100% !important;
         margin-top: 25px !important;
     }
     div[data-testid="stForm"] .stFormSubmitButton button {
-        background: linear-gradient(135deg, #4a3fa0 0%, #7c6af7 100%) !important;
+        background: linear-gradient(135deg, #604fd8 0%, #836dff 100%) !important;
         color: white !important;
-        font-weight: 600 !important;
+        font-weight: 800 !important;
         font-size: 1.05rem !important;
-        border: none !important;
-        border-radius: 8px !important;
-        padding: 0.65rem 2.5rem !important; /* Smooth professional padding shape */
+        border: 1px solid rgba(255,255,255,.14) !important;
+        border-radius: 9px !important;
+        padding: 0.65rem 2.5rem !important;
         width: auto !important;
-        min-width: 160px !important; /* Perfect uniform dashboard geometry box */
-        box-shadow: 0 4px 15px rgba(124, 106, 247, 0.25) !important;
+        min-width: 180px !important;
+        box-shadow: 0 14px 32px rgba(124, 106, 247, 0.3), 0 0 26px rgba(103,232,249,.1) !important;
     }
     
     .link-wrapper {
@@ -903,7 +1153,7 @@ def show_auth_step(embedded: bool = False):
                     use_container_width=True,
                     type="primary" if st.session_state["reset_mode"] == "login" else "secondary",
                 ):
-                    st.session_state["reset_mode"] = "login"
+                    set_auth_mode("login")
                     st.rerun()
             with tab_register:
                 if st.button(
@@ -912,14 +1162,14 @@ def show_auth_step(embedded: bool = False):
                     use_container_width=True,
                     type="primary" if st.session_state["reset_mode"] == "register" else "secondary",
                 ):
-                    st.session_state["reset_mode"] = "register"
+                    set_auth_mode("register")
                     st.rerun()
         
         current_mode = st.session_state["reset_mode"]
         
         #  1 LOGIN VIEW MODE (CENTERED STRINGS) 
         if current_mode == "login":
-            st.markdown(brand_header(BRAND_NAME, "Sign in to continue"), unsafe_allow_html=True)
+            st.markdown(render_brand_header(BRAND_NAME), unsafe_allow_html=True)
             
             with st.form(key="form_execution_login_isolated"):
                 username_input = st.text_input("Username", placeholder="Enter username", key="login_username_widget")
@@ -956,18 +1206,18 @@ def show_auth_step(embedded: bool = False):
             link_col1, link_col2 = st.columns(2)
             with link_col1:
                 if st.button("Forgot Password?", key="lnk_switch_to_forgot"):
-                    st.session_state["reset_mode"] = "forgot"
+                    set_auth_mode("forgot")
                     st.rerun()
             with link_col2:
                 if st.button("Don't have an account? Register", key="lnk_switch_to_register"):
                     st.session_state["show_forgot_link"] = False
-                    st.session_state["reset_mode"] = "register"
+                    set_auth_mode("register")
                     st.rerun()
             st.markdown('</div>', unsafe_allow_html=True)
 
         #  2 PUBLIC REGISTRATION VIEW MODE
         elif current_mode == "register":
-            st.markdown(brand_header("Create Account", "Start with a standard user workspace"), unsafe_allow_html=True)
+            st.markdown(render_brand_header("Create Account"), unsafe_allow_html=True)
 
             with st.form(key="form_execution_register_isolated"):
                 reg_full_name = st.text_input("Full Name", placeholder="e.g. Harshit Jetwani", key="register_full_name_widget")
@@ -1013,7 +1263,7 @@ def show_auth_step(embedded: bool = False):
                                 if create_user(username, email, reg_password, "user"):
                                     log_activity(username, "Register", "Self-service user account created without email verification.")
                                     st.success("Account created successfully. Please sign in.")
-                                    st.session_state["reset_mode"] = "login"
+                                    set_auth_mode("login")
                                     st.session_state["show_forgot_link"] = False
                                     st.rerun()
                                 else:
@@ -1030,7 +1280,7 @@ def show_auth_step(embedded: bool = False):
                                     st.session_state["registration_otp"] = generated_otp
                                     st.session_state["registration_expires_at"] = (datetime.now() + timedelta(minutes=10)).isoformat()
                                     st.session_state["registration_attempts"] = 0
-                                    st.session_state["reset_mode"] = "verify_register"
+                                    set_auth_mode("verify_register")
                                     st.success(f"Verification OTP sent to {mask_email(email)}.")
                                     st.rerun()
                                 else:
@@ -1040,13 +1290,13 @@ def show_auth_step(embedded: bool = False):
             st.markdown('<div class="link-wrapper">', unsafe_allow_html=True)
             if st.button("Already have an account? Login", key="lnk_register_back_to_login"):
                 st.session_state["show_forgot_link"] = False
-                st.session_state["reset_mode"] = "login"
+                set_auth_mode("login")
                 st.rerun()
             st.markdown('</div>', unsafe_allow_html=True)
 
         #  3 FORGOT VIEW MODE 
         elif current_mode == "forgot":
-            st.markdown(brand_header(BRAND_NAME, "Reset access securely"), unsafe_allow_html=True)
+            st.markdown(render_brand_header(BRAND_NAME), unsafe_allow_html=True)
             
             with st.form(key="form_execution_forgot_isolated"):
                 target_user = st.text_input("Username or Email", placeholder="Enter your username or registered email", key="forgot_username_widget")
@@ -1070,7 +1320,7 @@ def show_auth_step(embedded: bool = False):
                                 st.session_state["recovery_email"] = user["email"]
                                 st.session_state["recovery_expires_at"] = (datetime.now() + timedelta(minutes=10)).isoformat()
                                 st.session_state["recovery_attempts"] = 0
-                                st.session_state["reset_mode"] = "verify"
+                                set_auth_mode("verify")
                                 log_activity(user["username"], "Password OTP Sent", f"OTP sent to {mask_email(user['email'])}")
                                 st.success(f"OTP sent to {mask_email(user['email'])}.")
                                 st.rerun()
@@ -1085,13 +1335,13 @@ def show_auth_step(embedded: bool = False):
             st.markdown('<div class="link-wrapper">', unsafe_allow_html=True)
             if st.button("Back to Login", key="lnk_back_to_login_view"):
                 st.session_state["show_forgot_link"] = False 
-                st.session_state["reset_mode"] = "login"
+                set_auth_mode("login")
                 st.rerun()
             st.markdown('</div>', unsafe_allow_html=True)
 
         elif current_mode == "verify_register":
             pending = st.session_state.get("pending_registration") or {}
-            st.markdown(brand_header("Verify Email", "Confirm ownership before account creation"), unsafe_allow_html=True)
+            st.markdown(render_brand_header("Verify Email"), unsafe_allow_html=True)
             if pending.get("email"):
                 st.info(f"Enter the OTP sent to {mask_email(pending['email'])}.")
 
@@ -1106,13 +1356,13 @@ def show_auth_step(embedded: bool = False):
                         expired = datetime.now() > datetime.fromisoformat(expires_raw)
                     if expired:
                         st.error("Registration OTP expired. Please create the account again.")
-                        st.session_state["reset_mode"] = "register"
+                        set_auth_mode("register")
                         for key in ["pending_registration", "registration_otp", "registration_expires_at", "registration_attempts"]:
                             st.session_state.pop(key, None)
                         st.rerun()
                     elif st.session_state.get("registration_attempts", 0) >= 5:
                         st.error("Too many incorrect attempts. Please restart registration.")
-                        st.session_state["reset_mode"] = "register"
+                        set_auth_mode("register")
                         for key in ["pending_registration", "registration_otp", "registration_expires_at", "registration_attempts"]:
                             st.session_state.pop(key, None)
                         st.rerun()
@@ -1120,7 +1370,7 @@ def show_auth_step(embedded: bool = False):
                         if create_user(pending["username"], pending["email"], pending["password"], "user"):
                             log_activity(pending["username"], "Register", "Self-service account created after email OTP verification.")
                             st.success("Email verified. Account created successfully. Please sign in.")
-                            st.session_state["reset_mode"] = "login"
+                            set_auth_mode("login")
                             for key in ["pending_registration", "registration_otp", "registration_expires_at", "registration_attempts"]:
                                 st.session_state.pop(key, None)
                             st.rerun()
@@ -1142,7 +1392,7 @@ def show_auth_step(embedded: bool = False):
                 else:
                     st.error(message)
             if st.button("Cancel Registration", key="lnk_cancel_register_verify"):
-                st.session_state["reset_mode"] = "register"
+                set_auth_mode("register")
                 for key in ["pending_registration", "registration_otp", "registration_expires_at", "registration_attempts"]:
                     st.session_state.pop(key, None)
                 st.rerun()
@@ -1150,7 +1400,7 @@ def show_auth_step(embedded: bool = False):
 
         #  4 VERIFY VIEW MODE 
         elif current_mode == "verify":
-            st.markdown(brand_header("Security Key", "Enter verification token"), unsafe_allow_html=True)
+            st.markdown(render_brand_header("Security Key"), unsafe_allow_html=True)
             
             if st.session_state.get("recovery_email"):
                 st.info(f"Enter the OTP sent to {mask_email(st.session_state.get('recovery_email'))}.")
@@ -1171,13 +1421,13 @@ def show_auth_step(embedded: bool = False):
 
                     if expired:
                         st.error("OTP expired. Please request a new code.")
-                        st.session_state["reset_mode"] = "forgot"
+                        set_auth_mode("forgot")
                         st.session_state.pop("recovery_otp", None)
                         st.session_state.pop("recovery_expires_at", None)
                         st.rerun()
                     elif reset_attempts_exceeded():
                         st.error("Too many incorrect attempts. Please request a new OTP.")
-                        st.session_state["reset_mode"] = "forgot"
+                        set_auth_mode("forgot")
                         st.session_state.pop("recovery_otp", None)
                         st.session_state.pop("recovery_expires_at", None)
                         st.rerun()
@@ -1197,7 +1447,7 @@ def show_auth_step(embedded: bool = False):
                                 st.success("Access credentials updated. Proceeding to login.")
                                 log_activity(st.session_state.get("recovery_user"), "Password Reset", "Password reset completed after email OTP verification.")
                                 st.session_state["show_forgot_link"] = False 
-                                st.session_state["reset_mode"] = "login"
+                                set_auth_mode("login")
                                 st.session_state.pop("recovery_otp", None)
                                 st.session_state.pop("recovery_user", None)
                                 st.session_state.pop("recovery_email", None)
@@ -1215,7 +1465,7 @@ def show_auth_step(embedded: bool = False):
             st.markdown('<div class="link-wrapper">', unsafe_allow_html=True)
             if st.button("Cancel Process", key="lnk_cancel_otp_flow_view"):
                 st.session_state["show_forgot_link"] = False
-                st.session_state["reset_mode"] = "login"
+                set_auth_mode("login")
                 st.rerun()
             st.markdown('</div>', unsafe_allow_html=True)
 

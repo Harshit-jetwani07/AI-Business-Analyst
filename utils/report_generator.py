@@ -3,6 +3,9 @@ import pandas as pd
 import numpy as np
 import re
 from datetime import datetime
+from pathlib import Path
+
+from utils.branding import BRAND_LOGO_PATH, BRAND_NAME
 
 try:
     from fpdf import FPDF
@@ -56,10 +59,15 @@ class ReportGenerator:
             pdf.set_fill_color(37, 99, 235)
             pdf.rect(0, 0, 210, 8, "F")
 
+            # Brand logo
+            logo_path = Path(BRAND_LOGO_PATH)
+            if logo_path.exists():
+                pdf.image(str(logo_path), x=42, y=34, w=126)
+
             # Main Title Branding
             pdf.set_text_color(255, 255, 255)
             pdf.set_font("Arial", "B", 22)
-            pdf.set_y(105)
+            pdf.set_y(112)
             pdf.cell(0, 12, safe_txt(self.report_title).upper(), ln=True, align="C")
             
             # Subtitle
@@ -208,7 +216,11 @@ class ReportGenerator:
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", "B", 12)
-        pdf.cell(0, 10, "System Compilation Critical Block!", ln=1)
+        logo_path = Path(BRAND_LOGO_PATH)
+        if logo_path.exists():
+            pdf.image(str(logo_path), x=58, y=12, w=94)
+            pdf.ln(26)
+        pdf.cell(0, 10, f"{BRAND_NAME} Report Generation Notice", ln=1)
         pdf.ln(5)
         clean_error = str(error).replace("\n", " ").replace("\r", " ")
         pdf.multi_cell(0, 5, f"Tracking Trace Constraint Details: {clean_error}")

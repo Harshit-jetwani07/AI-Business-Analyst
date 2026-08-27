@@ -20,10 +20,10 @@ from utils.report_generator import ReportGenerator
 from utils.visualizer import Visualizer
 from utils.data_quality import evaluate_dataset_quality, detect_anomalies
 from utils.branding import (
+    BRAND_FAVICON_PATH,
     BRAND_NAME,
     BRAND_SHORT_DESCRIPTION,
     BRAND_TAGLINE,
-    brand_favicon_data_uri,
     brand_logo_data_uri,
 )
 
@@ -226,7 +226,7 @@ def make_unique_columns(columns):
 #  Page config 
 st.set_page_config(
     page_title=BRAND_NAME,
-    page_icon=brand_favicon_data_uri(),
+    page_icon=str(BRAND_FAVICON_PATH),
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -238,6 +238,16 @@ st.markdown("""
 
     .block-container {
         padding-top: 1rem !important;
+    }
+    [data-testid="stHeader"],
+    [data-testid="stToolbar"],
+    .stDeployButton {
+        display: none !important;
+    }
+    header[data-testid="stHeader"] {
+        height: 0 !important;
+        min-height: 0 !important;
+        background: transparent !important;
     }
     html, body, [class*="css"] {
         font-family: 'Space Grotesk', sans-serif;
@@ -384,6 +394,19 @@ st.markdown("""
         border: 1px solid #2a2a5a;
         border-radius: 8px;
     }
+    .sidebar-brand {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4px 0 16px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #1e1e3a;
+    }
+    .sidebar-brand img {
+        width: min(100%, 210px);
+        max-height: 50px;
+        object-fit: contain;
+    }
     .brand-hero {
         display: grid;
         grid-template-columns: minmax(230px, 340px) 1fr;
@@ -403,11 +426,11 @@ st.markdown("""
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 14px 18px;
-        border-radius: 18px;
-        background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(214,236,255,0.9));
-        border: 1px solid rgba(0, 212, 255, 0.35);
-        box-shadow: 0 14px 36px rgba(0, 212, 255, 0.15);
+        padding: 0;
+        border-radius: 0;
+        background: transparent;
+        border: 0;
+        box-shadow: none;
     }
     .brand-hero-logo img {
         width: 100%;
@@ -486,6 +509,14 @@ if not st.session_state.get("logged_in", False):
 
 #  Sidebar Content & Actions 
 with st.sidebar:
+    st.markdown(
+        f"""
+        <div class="sidebar-brand">
+            <img src="{brand_logo_data_uri()}" alt="{BRAND_NAME} logo">
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
     st.markdown(f"### 👋 Welcome, {st.session_state.username}")
     if st.session_state.role == "admin":
         st.success("Admin Access")
