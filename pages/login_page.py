@@ -9,7 +9,7 @@ from utils.auth import (
     get_conn, log_activity, authenticate, create_user, hash_password,
     get_login_lock, record_login_failure, clear_login_failures
 )
-from utils.branding import BRAND_NAME, BRAND_TAGLINE, brand_logo_data_uri
+from utils.branding import BRAND_NAME, BRAND_TAGLINE, brand_icon_data_uri, brand_logo_data_uri
 
 
 def password_strength(password: str) -> tuple[int, str]:
@@ -127,9 +127,19 @@ def set_auth_mode(mode: str):
 def show_landing_page():
     """Render premium scrollable marketing landing page for logged-out users."""
     logo_data_uri = brand_logo_data_uri()
+    icon_data_uri = brand_icon_data_uri()
     st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+    :root {
+        --bv-bg: #0a0a0f;
+        --bv-surface: #0d0d14;
+        --bv-purple: #7c6af7;
+        --bv-cyan: #00d4ff;
+        --bv-text: #ffffff;
+        --bv-muted: #9ca3af;
+        --bv-line: rgba(156, 163, 175, .16);
+    }
     html { scroll-behavior: smooth; }
     .stApp {
         background:
@@ -650,7 +660,10 @@ def show_landing_page():
             0 18px 42px rgba(0, 212, 255, .22),
             0 18px 54px rgba(124, 106, 247, .24);
     }
-    .bv-final .bv-btn.primary::after { content: "\2192"; font-size: 1.05rem; line-height: 1; }
+    .bv-btn-arrow {
+        font-size: 1.05rem;
+        line-height: 1;
+    }
     .bv-final .bv-btn.primary:hover {
         transform: translateY(-3px) scale(1.03);
         box-shadow:
@@ -678,8 +691,7 @@ def show_landing_page():
         box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
         transition: border-color .22s ease, color .22s ease, transform .22s ease;
     }
-    .bv-final-trust span::before {
-        content: "\2713";
+    .bv-trust-check {
         color: #00d4ff;
         font-weight: 900;
     }
@@ -689,75 +701,146 @@ def show_landing_page():
         transform: translateY(-1px);
     }
     .bv-footer {
-        margin-top: 24px;
-        padding: 46px clamp(20px, 5vw, 72px) 28px;
-        border-top: 1px solid rgba(148,163,184,.16);
+        position: relative;
+        overflow: hidden;
+        margin-top: 70px;
+        padding: 72px clamp(20px, 5vw, 72px) 34px;
+        border-top: 1px solid rgba(124,106,247,.16);
         background:
-            linear-gradient(180deg, rgba(9,14,31,.84), rgba(5,8,20,.98)),
-            radial-gradient(circle at 18% 10%, rgba(0,212,255,.13), transparent 32%),
-            radial-gradient(circle at 84% 0%, rgba(124,60,255,.16), transparent 30%);
-        color:#a6b2d2;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 -18px 60px rgba(0,0,0,.22);
+            radial-gradient(circle at 16% 0%, rgba(124,106,247,.12), transparent 30%),
+            radial-gradient(circle at 88% 18%, rgba(0,212,255,.10), transparent 26%),
+            linear-gradient(180deg, var(--bv-bg), var(--bv-surface));
+        color: var(--bv-muted);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
     }
     .bv-footer-grid {
         display: grid;
-        grid-template-columns: 1.25fr .72fr .72fr .72fr;
-        gap: 18px;
+        grid-template-columns: minmax(260px, 1.55fr) repeat(3, minmax(140px, .72fr));
+        gap: clamp(26px, 4vw, 54px);
         max-width: 1200px;
         margin: 0 auto;
-        padding: 28px;
-        border: 1px solid rgba(148,163,184,.16);
-        border-radius: 24px;
-        background: rgba(255,255,255,.045);
-        backdrop-filter: blur(18px);
+        padding: 0;
     }
     .bv-footer-brand {
-        padding-right: 18px;
-        border-right: 1px solid rgba(148,163,184,.14);
+        max-width: 410px;
     }
-    .bv-footer img { width: 150px; margin-bottom: 12px; }
-    .bv-footer-kicker {
+    .bv-footer-logo {
         display: inline-flex;
-        margin: 0 0 10px;
-        color: #67e8f9;
-        font-size: .78rem;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 14px;
+    }
+    .bv-footer-logo img {
+        width: auto;
+        height: 32px;
+        margin: 0;
+    }
+    .bv-footer-logo span {
+        color: var(--bv-text);
+        font-size: 1.08rem;
+        font-weight: 900;
+        letter-spacing: 0;
+    }
+    .bv-footer-kicker {
+        margin: 0;
+        color: var(--bv-muted);
+        font-size: .95rem;
+        font-weight: 650;
+        line-height: 1.7;
+    }
+    .bv-footer-col h4 {
+        color: var(--bv-text);
+        margin: 0 0 16px;
+        font-size: .88rem;
         font-weight: 850;
         text-transform: uppercase;
+        letter-spacing: .08em;
     }
-    .bv-footer p { color:#a6b2d2; line-height: 1.62; margin: 10px 0 18px; max-width: 390px; }
-    .bv-footer h4 { color:#ffffff; margin:0 0 12px; font-size: .9rem; text-transform: uppercase; letter-spacing: .08em; }
-    .bv-footer a { display:block; color:#c7d2f2; text-decoration:none; font-weight:750; margin: 9px 0; }
-    .bv-footer a:hover { color:#67e8f9; transform: translateX(2px); }
-    .bv-socials { display:flex; gap:10px; }
+    .bv-footer-col a {
+        display: block;
+        width: fit-content;
+        color: var(--bv-muted);
+        text-decoration: none;
+        font-weight: 700;
+        font-size: .94rem;
+        margin: 10px 0;
+        transition: color .22s ease, transform .22s ease;
+    }
+    .bv-footer-col a:hover {
+        color: var(--bv-cyan);
+        transform: translateX(2px);
+    }
+    .bv-socials {
+        display:flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
     .bv-socials a {
-        width:38px;
-        height:38px;
+        width: 40px;
+        height: 40px;
         display:flex;
         align-items:center;
         justify-content:center;
-        border-radius: 12px;
-        border:1px solid rgba(103,232,249,.22);
-        background:rgba(0,212,255,.07);
-        margin:0;
-        transition: transform .2s ease, border-color .2s ease;
+        margin: 0;
+        border-radius: 999px;
+        border:1px solid rgba(156,163,175,.22);
+        background:rgba(255,255,255,.025);
+        color: #dce6ff;
+        transition: border-color .22s ease, box-shadow .22s ease, color .22s ease, transform .22s ease;
     }
-    .bv-socials a:hover { transform: translateY(-2px); border-color: rgba(103,232,249,.55); }
+    .bv-socials a:hover {
+        color: #ffffff;
+        border-color: rgba(0,212,255,.58);
+        box-shadow: 0 0 24px rgba(0,212,255,.16), 0 0 28px rgba(124,106,247,.14);
+        transform: translateY(-2px);
+    }
+    .bv-socials svg {
+        width: 18px;
+        height: 18px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+    .bv-footer-divider {
+        max-width: 1200px;
+        height: 1px;
+        margin: 42px auto 24px;
+        background: linear-gradient(90deg, transparent, rgba(124,106,247,.32), rgba(0,212,255,.28), transparent);
+    }
     .bv-footer-bottom {
         max-width: 1200px;
-        margin: 18px auto 0;
-        padding: 0 4px;
+        margin: 0 auto;
         display:flex;
+        align-items: center;
         justify-content:space-between;
         gap:18px;
         flex-wrap:wrap;
+        color: var(--bv-muted);
         font-size:.88rem;
     }
+    .bv-footer-bottom-links {
+        display:flex;
+        align-items:center;
+        gap: 10px;
+    }
+    .bv-footer-bottom-links a {
+        display: inline-flex;
+        color: var(--bv-muted);
+        text-decoration: none;
+        font-weight: 750;
+        transition: color .22s ease;
+    }
+    .bv-footer-bottom-links a:hover { color: var(--bv-cyan); }
+    .bv-footer-dot { color: rgba(156,163,175,.45); }
     @media (max-width: 980px) {
         .bv-links { display:none; }
         .bv-hero { grid-template-columns: 1fr; min-height: auto; padding-top: 40px; }
         .bv-dashboard { min-height: auto; }
         .bv-stats, .bv-feature-grid, .bv-timeline, .bv-quotes { grid-template-columns: repeat(2, 1fr); }
         .bv-product-layout { grid-template-columns: 1fr; }
+        .bv-footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 640px) {
         .bv-nav { align-items:flex-start; flex-direction:column; }
@@ -769,8 +852,8 @@ def show_landing_page():
         .bv-preview-grid, .bv-stats, .bv-feature-grid, .bv-timeline, .bv-quotes, .bv-main-preview { grid-template-columns: 1fr; gap: 16px; }
         .bv-main-preview .performance-card, .bv-main-preview .summary-card { grid-column:auto; min-height: auto; }
         .bv-main-preview .performance-card .bv-line-chart { height: 150px; }
-        .bv-footer-grid { grid-template-columns: 1fr; padding: 22px; }
-        .bv-footer-brand { border-right: 0; padding-right: 0; }
+        .bv-footer-grid { grid-template-columns: 1fr; }
+        .bv-footer-bottom { flex-direction: column; align-items: flex-start; }
     }
     </style>
     """, unsafe_allow_html=True)
@@ -928,8 +1011,12 @@ def show_landing_page():
       <section class="bv-final">
         <h2>Start Analyzing Your <span class="bv-final-accent">Data Today</span></h2>
         <p>Upload a file, ask questions, detect patterns, forecast trends, and export your report.</p>
-        <a class="bv-btn primary" href="?auth_tab=register#top-auth">Get Started Free</a>
-        <div class="bv-final-trust"><span>No credit card required</span><span>Free forever plan</span><span>Setup in 2 minutes</span></div>
+        <a class="bv-btn primary" href="?auth_tab=register#top-auth">Get Started Free <span class="bv-btn-arrow" aria-hidden="true">→</span></a>
+        <div class="bv-final-trust">
+          <span><span class="bv-trust-check" aria-hidden="true">✓</span>No credit card required</span>
+          <span><span class="bv-trust-check" aria-hidden="true">✓</span>Free forever plan</span>
+          <span><span class="bv-trust-check" aria-hidden="true">✓</span>Setup in 2 minutes</span>
+        </div>
       </section>
     </div>
     """, unsafe_allow_html=True)
@@ -937,38 +1024,51 @@ def show_landing_page():
     st.markdown(f"""
     <footer class="bv-footer" id="resources">
       <div class="bv-footer-grid">
-        <div class="bv-footer-brand">
-          <img src="{logo_data_uri}" alt="{BRAND_NAME} logo">
-          <div class="bv-footer-kicker">{BRAND_TAGLINE}</div>
-          <p>BizVision AI helps teams turn CSV and Excel files into clear dashboards, AI insights, forecasts, anomaly checks, and PDF reports.</p>
-          <div class="bv-socials">
-            <a href="#" aria-label="GitHub">GH</a>
-            <a href="#" aria-label="LinkedIn">in</a>
-            <a href="#" aria-label="Twitter">X</a>
+        <div class="bv-footer-brand bv-footer-col">
+          <div class="bv-footer-logo">
+            <img src="{icon_data_uri}" alt="{BRAND_NAME} icon">
+            <span>{BRAND_NAME}</span>
           </div>
+          <p class="bv-footer-kicker">{BRAND_TAGLINE}</p>
         </div>
-        <div>
+        <div class="bv-footer-col">
           <h4>Product</h4>
           <a href="#features">Features</a>
-          <a href="#how">How it Works</a>
-          <a href="#pricing">Pricing</a>
-          <a href="?auth_tab=login#top-auth">Sign In</a>
+          <a href="#preview">Dashboard</a>
+          <a href="#how">Forecasting</a>
+          <a href="#pricing">Reports</a>
         </div>
-        <div>
-          <h4>Resources</h4>
-          <a href="#resources">Documentation</a>
-          <a href="#preview">Demo</a>
-          <a href="#features">FAQ</a>
-        </div>
-        <div>
-          <h4>Legal</h4>
+        <div class="bv-footer-col">
+          <h4>Company</h4>
+          <a href="#resources">About</a>
+          <a href="#resources">Contact</a>
           <a href="#resources">Privacy Policy</a>
           <a href="#resources">Terms of Service</a>
         </div>
+        <div class="bv-footer-col">
+          <h4>Connect</h4>
+          <div class="bv-socials">
+            <a href="https://github.com/Harshit-jetwani07/AI-Business-Analyst" aria-label="GitHub">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1.3-3.6c4.3-.5 8.8-2.1 8.8-9.5a7.4 7.4 0 0 0-2-5.1 6.9 6.9 0 0 0-.1-5.1s-1.6-.5-5.3 2a18.2 18.2 0 0 0-9.6 0c-3.7-2.5-5.3-2-5.3-2a6.9 6.9 0 0 0-.1 5.1 7.4 7.4 0 0 0-2 5.1c0 7.4 4.5 9 8.8 9.5A4.8 4.8 0 0 0 9 18v4"/><path d="M9 18c-4.5 2-5-2-7-2"/></svg>
+            </a>
+            <a href="mailto:contact@bizvision.ai" aria-label="Email">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z"/><path d="m22 6-10 7L2 6"/></svg>
+            </a>
+            <a href="https://www.linkedin.com/" aria-label="LinkedIn">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6Z"/><path d="M2 9h4v12H2z"/><path d="M4 4h.01"/></svg>
+            </a>
+          </div>
+        </div>
       </div>
+      <div class="bv-footer-divider"></div>
       <div class="bv-footer-bottom">
-        <span>Copyright 2026 BizVision AI. All rights reserved.</span>
-        <span>Secure analytics workspace · Made with care using Streamlit</span>
+        <span>© 2026 {BRAND_NAME}. All rights reserved.</span>
+        <span>Made with Streamlit</span>
+        <span class="bv-footer-bottom-links">
+          <a href="#resources">Privacy</a>
+          <span class="bv-footer-dot">·</span>
+          <a href="#resources">Terms</a>
+        </span>
       </div>
     </footer>
     """, unsafe_allow_html=True)
