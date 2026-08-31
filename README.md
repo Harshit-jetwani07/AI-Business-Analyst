@@ -6,9 +6,7 @@ BizVision AI is an end-to-end AI-powered business analytics platform built with 
 
 ## Live Demo
 
-Add your Streamlit deployment URL here after publishing:
-
-`https://your-app-name.streamlit.app`
+`https://aibusinessanalyst.streamlit.app`
 
 ## Key Features
 
