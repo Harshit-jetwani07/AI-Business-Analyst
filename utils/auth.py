@@ -8,6 +8,9 @@ DB_PATH = "data/users.db"
 PBKDF2_ITERATIONS = 260_000
 MAX_LOGIN_FAILURES = 5
 LOGIN_LOCK_MINUTES = 15
+DEMO_USERNAME = "demo_user"
+DEMO_EMAIL = "demo@bizvision.ai"
+DEMO_PASSWORD = "BizVision@2026"
 
 
 def _hash(password: str, salt: str) -> str:
@@ -150,6 +153,10 @@ def init_db():
                     _create_user_raw(c, "demouser", "user@bizai.com",     demo_user_password,    "user")
                     conn.commit()
 
+    if os.getenv("DISABLE_PORTFOLIO_DEMO_ACCOUNT", "").lower() not in {"1", "true", "yes"}:
+        _ensure_demo_user(c)
+        conn.commit()
+
     conn.close()
 
 
@@ -165,6 +172,25 @@ def _create_user_raw(cursor, username, email, password, role):
         "INSERT INTO users (username,email,salt,password,role,active,created) VALUES (?,?,?,?,?,1,?)",
         (username, email, salt, hashed, role, datetime.now().isoformat())
     )
+
+
+def _ensure_demo_user(cursor):
+    salt, hashed = hash_password(DEMO_PASSWORD)
+    existing = cursor.execute(
+        "SELECT id FROM users WHERE lower(username)=lower(?) OR lower(email)=lower(?)",
+        (DEMO_USERNAME, DEMO_EMAIL),
+    ).fetchone()
+    if existing:
+        cursor.execute(
+            """UPDATE users
+               SET username=?, email=?, salt=?, password=?, role='user', active=1
+               WHERE id=?""",
+            (DEMO_USERNAME, DEMO_EMAIL, salt, hashed, existing["id"]),
+        )
+    else:
+        _create_user_raw(cursor, DEMO_USERNAME, DEMO_EMAIL, DEMO_PASSWORD, "user")
+
+    cursor.execute("DELETE FROM login_attempts WHERE lower(username)=lower(?)", (DEMO_USERNAME,))
 
 
 def get_login_lock(username: str):
