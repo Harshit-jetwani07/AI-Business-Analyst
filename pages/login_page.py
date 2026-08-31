@@ -1018,59 +1018,57 @@ def show_landing_page():
           <span><span class="bv-trust-check" aria-hidden="true">✓</span>Setup in 2 minutes</span>
         </div>
       </section>
-    </div>
-    """, unsafe_allow_html=True)
 
-    st.markdown(f"""
-    <footer class="bv-footer" id="resources">
-      <div class="bv-footer-grid">
-        <div class="bv-footer-brand bv-footer-col">
-          <div class="bv-footer-logo">
-            <img src="{icon_data_uri}" alt="{BRAND_NAME} icon">
-            <span>{BRAND_NAME}</span>
+      <div class="bv-footer" id="resources">
+        <div class="bv-footer-grid">
+          <div class="bv-footer-brand bv-footer-col">
+            <div class="bv-footer-logo">
+              <img src="{icon_data_uri}" alt="{BRAND_NAME} icon">
+              <span>{BRAND_NAME}</span>
+            </div>
+            <p class="bv-footer-kicker">{BRAND_TAGLINE}</p>
           </div>
-          <p class="bv-footer-kicker">{BRAND_TAGLINE}</p>
-        </div>
-        <div class="bv-footer-col">
-          <h4>Product</h4>
-          <a href="#features">Features</a>
-          <a href="#preview">Dashboard</a>
-          <a href="#how">Forecasting</a>
-          <a href="#pricing">Reports</a>
-        </div>
-        <div class="bv-footer-col">
-          <h4>Company</h4>
-          <a href="#resources">About</a>
-          <a href="#resources">Contact</a>
-          <a href="#resources">Privacy Policy</a>
-          <a href="#resources">Terms of Service</a>
-        </div>
-        <div class="bv-footer-col">
-          <h4>Connect</h4>
-          <div class="bv-socials">
-            <a href="https://github.com/Harshit-jetwani07/AI-Business-Analyst" aria-label="GitHub">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1.3-3.6c4.3-.5 8.8-2.1 8.8-9.5a7.4 7.4 0 0 0-2-5.1 6.9 6.9 0 0 0-.1-5.1s-1.6-.5-5.3 2a18.2 18.2 0 0 0-9.6 0c-3.7-2.5-5.3-2-5.3-2a6.9 6.9 0 0 0-.1 5.1 7.4 7.4 0 0 0-2 5.1c0 7.4 4.5 9 8.8 9.5A4.8 4.8 0 0 0 9 18v4"/><path d="M9 18c-4.5 2-5-2-7-2"/></svg>
-            </a>
-            <a href="mailto:contact@bizvision.ai" aria-label="Email">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z"/><path d="m22 6-10 7L2 6"/></svg>
-            </a>
-            <a href="https://www.linkedin.com/" aria-label="LinkedIn">
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6Z"/><path d="M2 9h4v12H2z"/><path d="M4 4h.01"/></svg>
-            </a>
+          <div class="bv-footer-col">
+            <h4>Product</h4>
+            <a href="#features">Features</a>
+            <a href="#preview">Dashboard</a>
+            <a href="#how">Forecasting</a>
+            <a href="#pricing">Reports</a>
           </div>
+          <div class="bv-footer-col">
+            <h4>Company</h4>
+            <a href="#resources">About</a>
+            <a href="#resources">Contact</a>
+            <a href="#resources">Privacy Policy</a>
+            <a href="#resources">Terms of Service</a>
+          </div>
+          <div class="bv-footer-col">
+            <h4>Connect</h4>
+            <div class="bv-socials">
+              <a href="https://github.com/Harshit-jetwani07/AI-Business-Analyst" aria-label="GitHub">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 22v-4a4.8 4.8 0 0 0-1.3-3.6c4.3-.5 8.8-2.1 8.8-9.5a7.4 7.4 0 0 0-2-5.1 6.9 6.9 0 0 0-.1-5.1s-1.6-.5-5.3 2a18.2 18.2 0 0 0-9.6 0c-3.7-2.5-5.3-2-5.3-2a6.9 6.9 0 0 0-.1 5.1 7.4 7.4 0 0 0-2 5.1c0 7.4 4.5 9 8.8 9.5A4.8 4.8 0 0 0 9 18v4"/><path d="M9 18c-4.5 2-5-2-7-2"/></svg>
+              </a>
+              <a href="mailto:contact@bizvision.ai" aria-label="Email">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2Z"/><path d="m22 6-10 7L2 6"/></svg>
+              </a>
+              <a href="https://www.linkedin.com/" aria-label="LinkedIn">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6Z"/><path d="M2 9h4v12H2z"/><path d="M4 4h.01"/></svg>
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="bv-footer-divider"></div>
+        <div class="bv-footer-bottom">
+          <span>© 2026 {BRAND_NAME}. All rights reserved.</span>
+          <span>Made with Streamlit</span>
+          <span class="bv-footer-bottom-links">
+            <a href="#resources">Privacy</a>
+            <span class="bv-footer-dot">·</span>
+            <a href="#resources">Terms</a>
+          </span>
         </div>
       </div>
-      <div class="bv-footer-divider"></div>
-      <div class="bv-footer-bottom">
-        <span>© 2026 {BRAND_NAME}. All rights reserved.</span>
-        <span>Made with Streamlit</span>
-        <span class="bv-footer-bottom-links">
-          <a href="#resources">Privacy</a>
-          <span class="bv-footer-dot">·</span>
-          <a href="#resources">Terms</a>
-        </span>
-      </div>
-    </footer>
+    </div>
     """, unsafe_allow_html=True)
 
 
