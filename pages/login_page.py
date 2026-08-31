@@ -589,61 +589,105 @@ def show_landing_page():
         position: relative;
         overflow: hidden;
         margin: 0 clamp(18px, 4vw, 58px);
-        border-radius: 36px;
-        border: 1px solid rgba(255,255,255,.18);
+        isolation: isolate;
+        border-radius: 24px;
+        border: 1px solid transparent;
         background:
-            radial-gradient(circle at 50% 48%, rgba(255,255,255,.22), transparent 28%),
-            linear-gradient(115deg, rgba(124,60,255,.94), rgba(47,107,255,.94), rgba(0,212,255,.82));
+            linear-gradient(145deg, rgba(10,10,15,.94), rgba(13,15,28,.90)) padding-box,
+            linear-gradient(135deg, rgba(124,106,247,.95), rgba(0,212,255,.82)) border-box;
         text-align:center;
-        padding: 80px 24px;
-        box-shadow: 0 30px 90px rgba(47, 107, 255, .28);
+        padding: 82px clamp(22px, 5vw, 72px);
+        box-shadow:
+            0 34px 110px rgba(0, 0, 0, .48),
+            0 0 72px rgba(124, 106, 247, .18),
+            0 0 90px rgba(0, 212, 255, .12);
+        backdrop-filter: blur(18px);
     }
     .bv-final::before {
         content: "";
         position: absolute;
-        inset: 0;
-        background: repeating-radial-gradient(circle at 30% 40%, rgba(255,255,255,.10) 0 1px, transparent 1px 7px);
-        opacity: .18;
+        inset: -120px;
+        z-index: -2;
+        background:
+            radial-gradient(circle at 18% 12%, rgba(124,106,247,.24), transparent 26%),
+            radial-gradient(circle at 86% 78%, rgba(0,212,255,.22), transparent 28%),
+            radial-gradient(circle at 52% 10%, rgba(124,106,247,.13), transparent 22%);
+        filter: blur(120px);
         pointer-events: none;
     }
     .bv-final::after {
         content: "";
         position: absolute;
-        inset: -40%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
-        transform: rotate(12deg);
-        animation: bvShimmer 7s linear infinite;
+        inset: 0;
+        z-index: -1;
+        background-image:
+            radial-gradient(circle, rgba(255,255,255,.34) 0 1px, transparent 1px),
+            linear-gradient(180deg, rgba(255,255,255,.06), transparent 38%, rgba(0,212,255,.035));
+        background-size: 18px 18px, 100% 100%;
+        opacity: .045;
         pointer-events: none;
     }
     .bv-final h2, .bv-final p, .bv-final .bv-btn, .bv-final-trust { position: relative; z-index: 1; }
     .bv-final h2 { color:#fff; font-size: clamp(2.2rem, 5vw, 4.2rem); margin:0 0 16px; letter-spacing:-.04em; }
-    .bv-final p { color:rgba(255,255,255,.88); font-size:1.1rem; margin: 0 0 28px; }
+    .bv-final-accent {
+        background: linear-gradient(135deg, #ffffff 0%, #c9c2ff 42%, #8fefff 100%);
+        -webkit-background-clip: text;
+        color: transparent;
+    }
+    .bv-final p {
+        color: #b8c4e4;
+        font-size:1.1rem;
+        line-height: 1.65;
+        margin: 0 auto 30px;
+        max-width: 720px;
+    }
     .bv-final .bv-btn.primary {
         min-height: 52px;
         padding: 0 28px;
-        box-shadow: 0 22px 46px rgba(0, 0, 0, .24), 0 0 36px rgba(255,255,255,.18);
+        gap: 9px;
+        background: linear-gradient(135deg, #7c6af7 0%, #5f8dff 48%, #00d4ff 100%);
+        box-shadow:
+            0 18px 42px rgba(0, 212, 255, .22),
+            0 18px 54px rgba(124, 106, 247, .24);
     }
+    .bv-final .bv-btn.primary::after { content: "\2192"; font-size: 1.05rem; line-height: 1; }
     .bv-final .bv-btn.primary:hover {
-        transform: translateY(-3px) scale(1.035);
-        box-shadow: 0 28px 60px rgba(0, 0, 0, .3), 0 0 48px rgba(255,255,255,.3);
+        transform: translateY(-3px) scale(1.03);
+        box-shadow:
+            0 22px 52px rgba(0, 212, 255, .34),
+            0 24px 66px rgba(124, 106, 247, .34);
     }
     .bv-final-trust {
         display: flex;
         justify-content: center;
         flex-wrap: wrap;
         gap: 12px;
-        margin-top: 22px;
-        color: rgba(255,255,255,.9);
+        margin-top: 24px;
+        color: #dce6ff;
         font-weight: 800;
         font-size: .9rem;
     }
     .bv-final-trust span {
-        border: 1px solid rgba(255,255,255,.22);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(143,239,255,.24);
         border-radius: 999px;
-        background: rgba(4, 9, 24, .16);
-        padding: 8px 12px;
+        background: rgba(10, 10, 15, .44);
+        padding: 9px 13px;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+        transition: border-color .22s ease, color .22s ease, transform .22s ease;
     }
-    @keyframes bvShimmer { 0% { transform: translateX(-45%) rotate(12deg); } 100% { transform: translateX(45%) rotate(12deg); } }
+    .bv-final-trust span::before {
+        content: "\2713";
+        color: #00d4ff;
+        font-weight: 900;
+    }
+    .bv-final-trust span:hover {
+        border-color: rgba(124,106,247,.62);
+        color: #ffffff;
+        transform: translateY(-1px);
+    }
     .bv-footer {
         margin-top: 24px;
         padding: 46px clamp(20px, 5vw, 72px) 28px;
@@ -882,7 +926,7 @@ def show_landing_page():
       </section>
 
       <section class="bv-final">
-        <h2>Start Analyzing Your Data Today</h2>
+        <h2>Start Analyzing Your <span class="bv-final-accent">Data Today</span></h2>
         <p>Upload a file, ask questions, detect patterns, forecast trends, and export your report.</p>
         <a class="bv-btn primary" href="?auth_tab=register#top-auth">Get Started Free</a>
         <div class="bv-final-trust"><span>No credit card required</span><span>Free forever plan</span><span>Setup in 2 minutes</span></div>
